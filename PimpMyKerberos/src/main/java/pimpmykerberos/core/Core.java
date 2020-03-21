@@ -111,12 +111,12 @@ public class Core {
 	/*
 	 * Max lines for camera
 	 */
-	Integer maxDisplayLineInGUI=5;
+	Integer maxDisplayLineInGUI=10;
 	
 	/**
 	 * Default max keep day for files (all cam)
 	 */
-	Integer daysBeforePurge;
+	Integer daysBeforePurge=30;
 	
 	/**
 	 * Max column to display
@@ -541,26 +541,28 @@ public class Core {
 		this.maxDisplayColumnInGUI = maxDisplayColumnInGUI;
 	}
 	
-	public void cleanCamera(Integer cameraId)
+	public Integer cleanCamera(String cameraId)
 	{
 		User requester=Core.getInstance().getUsers().get("admin");
 		Camera aCamera=requester.getCameras().get(cameraId);
 		if ( aCamera != null )
 		{
-			aCamera.clean();
+			return aCamera.clean();
 		}
+		return 0;
 	}
 
-	public void cleanAll() {
+	public Integer cleanAll() {
 		User requester=Core.getInstance().getUsers().get("admin");
+		Integer count=0;
 		for ( Camera aCamera:requester.getCameras().values())
 		{
-			aCamera.clean();
+			count+=aCamera.clean();
 		}
-		
+		return count;
 	}
 
-	public Long seekCamera(Integer cameraId) {
+	public Long seekCamera(String cameraId) {
 		User requester=Core.getInstance().getUsers().get("admin");
 		Camera aCamera=requester.getCameras().get(cameraId);
 		if ( aCamera != null )
@@ -568,6 +570,7 @@ public class Core {
 			return aCamera.seek();
 		}else 
 		{
+			Fonctions.trace("ERR","Couldn't find cameraId " + cameraId ,"Core");
 		return Long.MAX_VALUE;	
 		}
 		

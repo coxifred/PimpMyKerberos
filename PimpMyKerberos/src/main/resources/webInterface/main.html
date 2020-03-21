@@ -4,12 +4,15 @@
 	   <title>PimpMyKerberos</title>
 	   <link rel="stylesheet" type="text/css" href="css/semantic.css"/>
 	   <link rel="stylesheet" type="text/css" href="css/main.css"/>
+	   <link rel="stylesheet" type="text/css" href="css/calendar.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
  	   
 
 	
 		<script>
 
 		var timeLineJson="";
+		var displayMenu=0;
 		const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour :'numeric', minute:'numeric',second: 'numeric' };
 		
 		function display(id){
@@ -28,6 +31,25 @@
 			setInterval(reloadMemory, 10000);
 			setInterval(reloadSpace, 10000);
 			
+			$("#calendar").datepicker(
+				{
+					onSelect: function(dateText) {
+								     			    console.log("Selected date: " + dateText + "; input's current value: " + this.value);
+													getValueFromUrl("camera?action=fromDay&date="+ dateText,true,function (json){
+																try {
+																	timeLineJson=JSON.parse(json);
+																	console.log("from picker " + timeLineJson);
+																	loadStoreCamera(true);	
+																	}
+																	catch (e)
+																	{
+																		console.log(e);
+																	}
+													});
+											    } 
+				}
+			);
+			$("#calendar").datepicker("option","dateFormat","yy-mm-dd");
 				
 			
 			
@@ -69,8 +91,10 @@
 			$("#cleanAll").click(function(e){
 				button=$(this);
 				button.addClass("loading");
-				getValueFromUrl("admin?action=cleanAll",true,function (){
+				getValueFromUrl("camera?action=cleanAll",true,function (){
 					button.removeClass("loading");	
+					timeLineJson="";
+					reloadSpace();
 					loadStoreCamera(true);	
 				});
 			});
@@ -79,8 +103,10 @@
 				button=$(this);
 				button.addClass("loading");
 				id=$(this).attr("id");
-				getValueFromUrl("admin?action=cleanCam&id="+ id,true,function (){
+				getValueFromUrl("camera?action=cleanCam&id="+ id,true,function (){
 					button.removeClass("loading");
+					timeLineJson="";
+					reloadSpace();
 					loadStoreCamera(true);	
 				});
 			});
@@ -89,7 +115,7 @@
 				button=$(this);
 				button.addClass("loading");
 				id=$(this).attr("id");
-				getValueFromUrl("admin?action=seek&id="+ id,true,function (json){
+				getValueFromUrl("camera?action=seek&id="+ id,true,function (json){
 					try {
 						timeLineJson=JSON.parse(json);
 						console.log(timeLineJson);
@@ -104,17 +130,17 @@
 				});
 			});
 							
-			
-			function isSeen(el) {
-  				return el.getBoundingClientRect().bottom <= window.innerHeight
-			}
-
+		
 			
 			$(window).scroll(function(){
 
 				//console.log("Reload top:" + $(".loadMore").last().offset().top + " scrollTop:" +  $(window).scrollTop() );
 				if ( ($(".loadMore").last().offset().top - 1000)  < $(window).scrollTop())
 				{
+					$("body").find(".forceDisplay").show();
+					$("body").find(".waitingPimp").hide();
+					
+					
 					$(".loadMore").last().remove();
 					console.log("Complete Reload");
 					loadStoreCamera(false);
@@ -126,14 +152,17 @@
 			
 				$("#menuDisplay").click(function(e)
 					{
-						//$('#menu').remove();
-						$('#menu').sidebar(
-							{
-								 'onHidden': function(){
-      										    $('#body').css('overflow', 'initial');
-							     }
-							}
-						).sidebar('toggle');
+						if ( displayMenu == 0 )
+						{
+							$("#menu").show();
+							$("#menu").transition('fly left');
+							displayMenu=1;
+						}else
+						{
+								$("#menu").hide();
+								$("#menu").transition('slide up')
+								displayMenu=0;
+						}
 					});	
 		
 		
@@ -172,8 +201,17 @@
 			var crunch="";
 			if ( timeLineJson != "" )
 			{
-				crunch="&startCrunch=" + timeLineJson.endCrunch;	
+
+				if ( redraw )
+				 {
+					crunch="&startCrunch=" + (timeLineJson.startCrunch);
+				 }else
+				 {
+					crunch="&startCrunch=" + (timeLineJson.endCrunch);				
+				 }
+	
 			}
+			
 			getValueFromUrl("camera?action=getTimeLine" + crunch,true,function(json){
 													
 				try {
@@ -191,16 +229,16 @@
 							}else
 							{
 								html+="<td >";
-								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;height:250px><i style=z-index:200 class=\"notched circle loading icon\"></i></div>";
+								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;height:250px><i style=z-index:200 class=\"waitingPimp notched circle loading icon\"></i></div>";
 								 if ( timeLine[k].pathToMedia.endsWith("mp4"))
 									{
-										 aDate=new 	Date(timeLine[k].time);
+										 aDate=new Date(timeLine[k].time);
 									
 										 html += "<div><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
-										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=videoCam loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; height=250 controls src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
+										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; height=250 controls src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
 									}else
 									{
-										 html += "<img height=250 id=\"" + k + "_" + timeLine[k].time + "\" src=" + timeLine[k].pathToMedia + "\"/>";										
+										 html += "<img class=forceDisplay height=250 id=\"" + k + "_" + timeLine[k].time + "\" src=" + timeLine[k].pathToMedia + "\"/>";										
 									}
 								html+="</td>";
 								//console.log(timeLine[k]);
@@ -246,11 +284,8 @@
 							ip=window.location.hostname;
 						}
  						html+="<td>";
-									
-							
-							
-							html+="<button id=" + i + " class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i><a target=new href=http://" + ip +":" + camera.broadcastPort + " >Seek</a></button>";
-							html+="<button id=" + i + " class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i><a target=new href=http://" + ip +":" + camera.broadcastPort + " >Purge Files</a></button>";
+							html+="<button id=\"" + camera.name + "\" class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i>Seek</button>";
+							html+="<button id=\"" + camera.name + "\" class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i>Purge Files</button>";
 							html+="<button class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Settings</a></button>";
 							html+="<br><a target=new href=http://" + ip +":" + camera.broadcastPort + " ><img style=border-radius:5px;z-index:1000 height=250px src=http://" + ip +":" + camera.broadcastPort+"/></a>"
 						html+="</td>";
@@ -366,7 +401,8 @@
 		</button>
 		
 		
-		<div id=menu class="ui right vertical inverted sidebar labeled icon menu">
+		
+		<div id=menu style=display:none;position:fixed;z-index:2000;right:-4px;top:42px class="ui compact vertical labeled icon menu">
 			  <a class="item">
 			    <i id=setPath class="home icon"></i>
 			    Set kerberos.io path
@@ -380,16 +416,12 @@
 			   	Clean old files
 			  </a>
 			  <a class="item">
-				<i onclick=javascript:window.open('/save') id=save class="save icon"></i>
+				<i onclick=javascript:window.open('admin?action=save') id=save class="save icon"></i>
 			   	Save config
 			  </a>
 	 		  <a class="item">
-				<i id=logs class="archive icon"></i>
+				<i onclick=javascript:window.open('admin?action=getLogs') id=logs class="archive icon"></i>
 			   	Logs
-			  </a>
-			  <a class="item">
-				<i id=calendar class="calendar alternate outline icon"></i>
-			   	Calendar
 			  </a>
 			  <a class="item">
 			    <i id=logout class="power off icon"></i>
@@ -398,6 +430,17 @@
 			</div>
 		
 		
+	
+		
+		<div style=position:fixed;z-index:1000;top:5px;right:50px class="ui calendar" >
+			    <div class="ui input left icon">
+			      <i class="calendar icon"></i>
+			      	<input type="text" placeholder="Date" id="calendar">
+			    </div>
+			</div>
+			
+
+ 			
 
 <div id=cameraHeader style=position:fixed;z-index:1000;top:40px;margin-left:20px;margin-right:20px;width:100%>
 

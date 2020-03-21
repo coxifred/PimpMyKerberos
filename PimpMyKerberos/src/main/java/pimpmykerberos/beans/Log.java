@@ -147,16 +147,18 @@ public class Log {
 
 	@Override
 	public String toString() {
-		return "Log [date=" + date + ", s_date=" + s_date + ", severity=" + severity + ", from=" + from + ", message="
-				+ message + ", thread=" + thread + "]";
+		//return "<tr><td>" + date + "</td><td>" + severity + "</td><td>" + from + "</td><td>" + thread + "</td><td>" +  message + "</td></tr>";
+		return "" + date + " " + severity + " " + from + " " + thread + " " +  message + " ";
 	}
 
 	public static String getSimpleLogs(String include, String exclude, List<Log> logs) {
 		StringBuilder strb=new StringBuilder();
+		strb.append("<html><head></head><body><table>");
 		for ( Log aLog:getLogs(include, exclude, logs) )
 		{
-			strb.append(aLog.toString() +"\n");
+			strb.append("<div><code>" + aLog.toString().replaceAll(" ", "&nbsp;").replaceAll("<","&lt;").replaceAll(">", "&gt;") +"</code></div>");
 		}
+		strb.append("</table></body></html>");
 		return strb.toString();
 	}
 

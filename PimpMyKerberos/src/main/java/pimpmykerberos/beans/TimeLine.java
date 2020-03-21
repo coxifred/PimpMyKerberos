@@ -27,7 +27,7 @@ public class TimeLine {
 				if (cameraToMediaTemp.containsKey(aTime)) {
 					mediaz = cameraToMediaTemp.get(aTime);
 				}
-				mediaz.put(cameraNumber, new Media(aCamera.getTimeToFile().get(aTime),aTime));
+				mediaz.put(cameraNumber, new Media(aCamera.getTimeToFile().get(aTime),aTime,aCamera.getName()));
 				cameraToMediaTemp.put(aTime, mediaz);
 			}
 			cameraNumber++;

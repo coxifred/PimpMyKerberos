@@ -94,7 +94,9 @@ public class AdminServlet extends AbstractServlet {
 			FileInputStream in;
 			OutputStream out = response.getOutputStream();
 			in = new FileInputStream(Core.getInstance().getCoreFile());
-
+			response.setContentType("text/xml");
+	        // Make sure to show the download dialog
+	        response.setHeader("Content-disposition","attachment; filename=" + Fonctions.getDateFormat(new Date(),null) + "_aCore.xml");
 			byte[] buffer = new byte[4096];
 			int length;
 			while ((length = in.read(buffer)) > 0) {
@@ -172,7 +174,7 @@ public class AdminServlet extends AbstractServlet {
 
 		if (requester != null) {
 			if (requester.getName().equals("admin")) {
-				response.getWriter().write(toGson(Log.getSimpleLogs(include, exclude, Core.getInstance().getLogs())));
+				response.getWriter().write(Log.getSimpleLogs(include, exclude, Core.getInstance().getLogs()));
 			} else {
 
 			}

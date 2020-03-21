@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -88,8 +89,9 @@ public class Fonctions {
 			if (format_Ex_YYYY_MM_DD == null) {
 				format_Ex_YYYY_MM_DD = "yyyyMMddHHmmss";
 			}
+			
 			SimpleDateFormat df = new SimpleDateFormat(format_Ex_YYYY_MM_DD);
-
+			df.setTimeZone(TimeZone.getDefault());
 			dt = df.parse(date);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

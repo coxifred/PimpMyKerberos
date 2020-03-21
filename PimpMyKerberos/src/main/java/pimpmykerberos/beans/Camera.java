@@ -19,7 +19,7 @@ public class Camera {
 	String capturePath;
 	String ip;
 	Integer kerberosPort;
-	Integer daysBeforePurge;
+	Integer daysBeforePurge=30;
 	Integer broadcastPort;
 	Date freshDate;
 	transient TreeMap<Long, String> timeToFile = new TreeMap<Long, String>();
@@ -140,14 +140,14 @@ public class Camera {
 		return true;
 	}
 
-	public void clean() {
+	public Integer clean() {
 		Calendar calendar = Calendar.getInstance();
 		if (getDaysBeforePurge() < Core.getInstance().getDaysBeforePurge()) {
 			calendar.add(Calendar.DAY_OF_YEAR, -getDaysBeforePurge());
 		} else {
 			calendar.add(Calendar.DAY_OF_YEAR, -Core.getInstance().getDaysBeforePurge());
 		}
-
+		Integer count=0;
 		File captureDir = new File(capturePath);
 		if (captureDir.exists() && captureDir.isDirectory()) {
 			Fonctions.trace("DBG",
@@ -158,6 +158,7 @@ public class Camera {
 					Fonctions.trace("DBG", "Cleaning file " + aFile.getAbsolutePath(), "Camera");
 					try {
 						FileUtils.forceDelete(aFile);
+						count++;
 					} catch (IOException e) {
 						Fonctions.trace("ERR", "Can't clean " + aFile.getAbsolutePath() + " " + e.getMessage(),
 								"Camera");
@@ -165,7 +166,7 @@ public class Camera {
 				}
 			}
 		}
-
+		return count;
 	}
 
 	public Long seek() {

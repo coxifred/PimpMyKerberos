@@ -3,6 +3,8 @@ package pimpmykerberos.server.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -70,10 +72,42 @@ public class CameraServlet extends AbstractServlet {
 			case "cleanAll":
 				cleanAll(request, response);
 				break;
+			case "fromDay":
+				fromDay(request,response);
+				break;
 
 			}
 		}
 
+	}
+
+	private void fromDay(HttpServletRequest request, HttpServletResponse response) {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				String date=request.getParameter("date");
+				if ( date != null)
+				{
+				 try{
+				 
+				  Date aDate=Fonctions.getDateFormat(date+"_23:59:50", "yyyy-MM-dd_hh:mm:ss");
+				  int time_offset;
+			      Calendar cal = Calendar.getInstance();
+			      time_offset = Calendar.DST_OFFSET - Calendar.ZONE_OFFSET;
+			      cal.setTime(aDate);
+			      cal.add(Calendar.HOUR, -time_offset);
+			      cal.getTime();
+			      Fonctions.trace("DBG", "Display from  " + cal.getTime(), "CameraServlet");
+				  String startCrunch=Long.toString( cal.getTimeInMillis());
+				  String size = request.getParameter("size");
+   				  response.getWriter().write(toGson(Core.getInstance().getTimeline().extract(startCrunch,size)));
+				 }catch (Exception e)
+				 {
+					 Fonctions.trace("ERR", "Couldn't parse date as Date " + date, "CameraServlet");
+				 }
+				}
+			}
+		}
 	}
 
 	private void seek(HttpServletRequest request, HttpServletResponse response) {
@@ -84,13 +118,13 @@ public class CameraServlet extends AbstractServlet {
 				if ( idCam != null )
 				{
 				 try{
-				  Integer id=Integer.decode(idCam);
-				  String startCrunch=Core.getInstance().seekCamera(id).toString();
+				  String startCrunch=Core.getInstance().seekCamera(idCam).toString();
+				  Fonctions.trace("DBG", "Seeking camera " + idCam + " to " + startCrunch + " " , "CameraServlet");
 				  String size = request.getParameter("size");
    				  response.getWriter().write(toGson(Core.getInstance().getTimeline().extract(startCrunch,size)));
 				 }catch (Exception e)
 				 {
-					 Fonctions.trace("ERR", "Couldn't parse idCam as Integer " + idCam, "CameraServlet");
+					 Fonctions.trace("ERR", "Couldn't seek camera " + idCam, "CameraServlet");
 				 }
 				}
 			}
@@ -102,7 +136,7 @@ public class CameraServlet extends AbstractServlet {
 		User requester = (User) request.getSession().getAttribute("USER");
 		if (requester != null) {
 			if (requester.getName().equals("admin")) {
-				Core.getInstance().cleanAll();
+				response.getWriter().write(Core.getInstance().cleanAll());
 			}
 		}
 		
@@ -116,11 +150,10 @@ public class CameraServlet extends AbstractServlet {
 				if ( idCam != null )
 				{
 				 try{
-				  Integer id=Integer.decode(idCam);
-				  Core.getInstance().cleanCamera(id);
+					 response.getWriter().write(Core.getInstance().cleanCamera(idCam));
 				 }catch (Exception e)
 				 {
-					 Fonctions.trace("ERR", "Couldn't parse idCam as Integer " + idCam, "CameraServlet");
+					 Fonctions.trace("ERR", "Couldn't clean idCam " + idCam, "CameraServlet");
 				 }
 				}
 			}
