@@ -1,0 +1,136 @@
+<html>
+<head>
+
+
+
+
+
+<script src="javascript/jquery.js"></script>
+
+<link rel="stylesheet" type="text/css" href="css/semantic.css" />
+<link rel="stylesheet" type="text/css" href="css/login.css" />
+
+<script>
+
+	function getUrlVars(cle)
+	{
+	    var vars = [], hash;
+	    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	    for(var i = 0; i < hashes.length; i++)
+	    {
+	        hash = hashes[i].split('=');
+	        vars.push(hash[0]);
+	        vars[hash[0]] = hash[1];
+	    }
+	    var valeur = vars[cle];
+	    return valeur;
+	}
+	
+	$(document).ready(function() {
+		redirect=getUrlVars("redirect");
+		getValueFromUrl("admin?action=isLogged",true,function(isLogged){
+			if ( isLogged == "true" )
+			{
+				toMainMenu("/main.html");
+			}
+		});
+		$("body").click(function(e){
+			$("#loginForm").show();
+			});
+	
+		$("#login").click(function(e){
+			getValueFromUrl("admin?action=login&user=" + $("#user").val() + "&passwd=" + $("#passwd").val(),true,toMainMenu);
+		});
+		
+		
+		
+		function toMainMenu(logged)
+		{
+			if ( redirect != "" && typeof redirect != "undefined" )
+			{
+				
+				setUrl(redirect);	
+			}else
+			{
+				
+		 		setUrl(logged);
+			}
+		}
+		
+		/**
+		 * Function Ajax
+		 * @param theUrl
+		 * @param asyncMode
+		 * @returns
+		 */
+		function getValueFromUrl(theUrl,asyncMode,myfunction) {
+			var retour; 
+			try 
+			{
+			var request = $
+					.ajax({
+						url : theUrl,
+						type : "POST",
+						data : {},
+						async : asyncMode,
+						dataType : "html",
+							error:function(xhr, status, errorThrown) {
+//							alert("ERROR ! " + errorThrown+'\n'+status+'\n'+xhr.statusText);
+								retour="ERROR";
+					        } 
+					});
+					
+			request
+					.done(function(msg) {
+						if ( typeof myfunction != "undefined" )
+							{
+							myfunction(msg);
+							}else
+								{
+						retour = trim(msg);
+								}
+						
+					});
+					return retour;
+					
+		}	catch (err)
+		{
+			retour = "ERROR";
+			return retour;
+			}
+		}
+		
+		function setUrl(url)
+		{
+			document.location=url;
+		}
+		
+		function trim (myString)
+	    {
+	    return myString.replace(/^\s+/g,'').replace(/\s+$/g,'');
+	    } 
+	});	
+</script>
+
+
+
+
+</head>
+
+<body class=background-color:"#943633">
+
+		<center><img style=position:relative;top:300px height=40% src=images/wolf.png><center>
+	
+    	<div class=loginForm>
+	        <div><input class="textField noselect" type="text" id=user name="user" placeholder=" Username" required="required" /></div>
+	        <div><input class="textField noselect" type="password" id=passwd name="Passwd" placeholder=" Password" required="required" /></div>
+			
+			<button id=login class="ui primary button loginButton ">
+  				Login
+			</button>
+		</div>        
+    
+    	<div class="footer">A product by <img style=position:relative;top:32px height=64px src=images/bab.png><a href=https://github.com/coxifred>Coxifred</a></div>
+
+</body>
+</html>

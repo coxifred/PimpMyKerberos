@@ -1,0 +1,91 @@
+body {
+ 
+ background-color: #943633;
+ margin:0;
+ padding:0;
+ -webkit-background-size: cover; /* pour anciens Chrome et Safari */
+ background-size: cover; /* version standardis�e */
+}
+
+
+/* unvisited link */
+a:link {
+  color: white;
+}
+
+/* visited link */
+a:visited {
+  color: white;
+}
+
+/* mouse over link */
+a:hover {
+  color: white;
+}
+
+/* selected link */
+a:active {
+  color: white;
+}
+
+.noselect{
+	-webkit-touch-callout: text; /* iOS Safari */
+    -webkit-user-select: text; /* Safari */
+     -khtml-user-select: text; /* Konqueror HTML */
+       -moz-user-select: text; /* Old versions of Firefox */
+        -ms-user-select: text; /* Internet Explorer/Edge */
+            user-select: text; /* Non-prefixed version, currently*/
+}
+
+.blink {
+  animation: blinker 1s linear infinite;
+}
+
+.loginForm {
+  width: 200px;
+  position:relative;
+  top:100px;
+  background-color: rgba(255,255,255,.8);
+  border-radius: 5px;
+  text-align: center;	
+}
+
+.textField {
+  	
+	color: #74838E;
+    border: 0;
+    border-radius: 3px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    padding: 8px 12px;
+ 	background-color: rgba(255,255,255,.5);
+    margin: 0;
+    height: 38px;
+    margin-bottom: 10px;
+}
+
+.loginButton {
+  	  background-color: rgba(33,133,208,.5);
+}
+
+.footer{
+	color: #fff;
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+}
+
+
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+}
+
+
+
