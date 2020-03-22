@@ -69,6 +69,15 @@ public class AdminServlet extends AbstractServlet {
 			case "getLogs":
 				getLogs(request, response);
 				break;
+			case "setNightMode":
+				setNightMode(request, response);
+				break;
+			case "getCore":
+				getCore(request,response);
+				break;
+			case "setMuteMode":
+				setMuteMode(request, response);
+				break;
 			case "debug":
 				debug(request, response);
 				break;
@@ -87,6 +96,50 @@ public class AdminServlet extends AbstractServlet {
 			}
 
 		}
+	}
+
+	private void getCore(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				response.getWriter().write(toGson(Core.getInstance()));
+			}
+		}
+		
+	}
+
+	private void setMuteMode(HttpServletRequest request, HttpServletResponse response) {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				String muteMode=request.getParameter("muteMode");
+				try {
+					Integer mute=Integer.decode(muteMode);
+					Core.getInstance().setMuteMode(mute);
+				} catch (Exception e)
+				{
+					Fonctions.trace("ERR", "Couldn't parse muteMode to Integer " + muteMode, "AdminServlet");
+				}
+			}
+		}
+		
+	}
+
+	private void setNightMode(HttpServletRequest request, HttpServletResponse response) {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				String nightMode=request.getParameter("nightMode");
+				try {
+					Integer night=Integer.decode(nightMode);
+					Core.getInstance().setNightMode(night);
+				} catch (Exception e)
+				{
+					Fonctions.trace("ERR", "Couldn't parse nightMode to Integer " + nightMode, "AdminServlet");
+				}
+			}
+		}
+		
 	}
 
 	private void downloadConfig(HttpServletRequest request, HttpServletResponse response) {

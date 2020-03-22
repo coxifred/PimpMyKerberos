@@ -24,7 +24,7 @@ import pimpmykerberos.utils.Fonctions;
 @ServerEndpoint(value = "/hello")
 public class AdminWebSocket implements WebSocketListener {
 	
-	private static Map<String, Session> allSessions=new HashMap<String,Session>();
+	private static Map<Integer, Session> allSessions=new HashMap<Integer,Session>();
 
 	Boolean close = false;
 
@@ -37,7 +37,7 @@ public class AdminWebSocket implements WebSocketListener {
 	@OnWebSocketConnect
 	public void onWebSocketConnect(Session session) {
 		Fonctions.trace("DBG", "onWebSocketConnect", "CORE");
-		allSessions.put(session.toString(), session);
+		allSessions.put(session.hashCode(), session);
 	}
 
 	@OnWebSocketError
@@ -61,19 +61,21 @@ public class AdminWebSocket implements WebSocketListener {
 	public synchronized static void broadcastMessage(Message message) {
 		Gson aGson=new Gson();
 		String messageJson=aGson.toJson(message);
-		List<String> toClean=new ArrayList<String>();
+		List<Integer> toClean=new ArrayList<Integer>();
+		Fonctions.trace("DBG",allSessions.size() + " sessions in cache before sending message","AdminWebSocket");
 		for (Session sess : allSessions.values()) {
 			try {
 				sess.getRemote().sendString(messageJson);
 			} catch (Exception e) {
-				Fonctions.trace("ERR", "Error while sending to session " + sess.getRemoteAddress().getHostName() + " removing session from map considering as vanished", "AdminWebSocket");
-				toClean.add(sess.toString());
+				Fonctions.trace("ERR", "Error while sending to session [" + sess.toString() + "] " + sess.getRemoteAddress().getHostName() + " removing session from map considering as vanished", "AdminWebSocket");
+				toClean.add(sess.hashCode());
 			}
 		}
-		for ( String aSession:toClean)
+		for ( Integer aSession:toClean)
 		{
 			allSessions.remove(aSession);
 		}
+		Fonctions.trace("DBG",allSessions.size() + " sessions in cache after sending message","AdminWebSocket");
 	}
 	
 
@@ -85,13 +87,15 @@ public class AdminWebSocket implements WebSocketListener {
 		this.close = close;
 	}
 
-	public static Map<String, Session> getAllSessions() {
+	public static Map<Integer, Session> getAllSessions() {
 		return allSessions;
 	}
 
-	public static void setAllSessions(Map<String, Session> allSessions) {
+	public static void setAllSessions(Map<Integer, Session> allSessions) {
 		AdminWebSocket.allSessions = allSessions;
 	}
+
+	
 
 
 

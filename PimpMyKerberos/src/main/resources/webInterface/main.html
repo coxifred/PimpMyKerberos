@@ -13,6 +13,9 @@
 
 		var timeLineJson="";
 		var displayMenu=0;
+		var nightMode=0;
+		var core;
+		var mute=0;
 		const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour :'numeric', minute:'numeric',second: 'numeric' };
 		
 		function display(id){
@@ -24,12 +27,15 @@
 		
 		$(document).ready(function() {
 		
+			loadCore();
 			WebSocketClient.open(url("hello")); 
-			reloadMemory();reloadSpace();loadLiveCamera();
+			reloadMemory();reloadSpace();loadLiveCamera();setNightMode(nightMode);
 			loadStoreCamera(true);
 		
 			setInterval(reloadMemory, 10000);
+			setInterval(displayTime, 1000);
 			setInterval(reloadSpace, 10000);
+			setInterval(garbageTimeCollector,10000);
 			
 			$("#calendar").datepicker(
 				{
@@ -50,9 +56,29 @@
 				}
 			);
 			$("#calendar").datepicker("option","dateFormat","yy-mm-dd");
-				
 			
+			$('#muteCheck').checkbox().checkbox({
+					    onChecked: function() {
+							      				mute=1;
+												getValueFromUrl("admin?action=setMuteMode&muteMode=1",true);
+											  },
+					    onUnchecked: function() {
+											     mute=0;
+												getValueFromUrl("admin?action=setMuteMode&muteMode=0",true);
+												}
+									});
+    
 			
+			$('#nightCheck').checkbox().checkbox({
+					    onChecked: function() {
+							      				setNightMode(1);
+												getValueFromUrl("admin?action=setNightMode&nightMode=1",true);
+											  },
+					    onUnchecked: function() {
+											   setNightMode(0);
+												getValueFromUrl("admin?action=setNightMode&nightMode=0",true);
+												}
+									});
 			
 			
 			
@@ -87,15 +113,38 @@
 				});
 			});
 			
+			$("#reloadButton").click(function(e){
+				button=$(this);
+				button.addClass("loading");
+				timeLineJson="";
+				loadStoreCamera(true);	
+				button.removeClass("loading");
+				$("#reloadMessage").transition('fade down')
+				setNightMode(nightMode);
+			});
+			
+			$("#declineButton").click(function(e){
+				$("#reloadMessage").transition('fade down')
+			});
+			
+			$("#muteButton").click(function(e){
+				$("#reloadMessage").transition('fade down');
+				$('#muteCheck').checkbox('set checked');
+				mute=1;
+				getValueFromUrl("admin?action=setMuteMode&muteMode=1",true);
+			});
+			
 			
 			$("#cleanAll").click(function(e){
 				button=$(this);
 				button.addClass("loading");
-				getValueFromUrl("camera?action=cleanAll",true,function (){
+				getValueFromUrl("camera?action=cleanAll",true,function (value){
 					button.removeClass("loading");	
 					timeLineJson="";
 					reloadSpace();
 					loadStoreCamera(true);	
+					$('#purgeCounter').html(value + "  purged file(s).");
+					$('#purgeCount').modal('show');
 				});
 			});
 			
@@ -103,11 +152,13 @@
 				button=$(this);
 				button.addClass("loading");
 				id=$(this).attr("id");
-				getValueFromUrl("camera?action=cleanCam&id="+ id,true,function (){
+				getValueFromUrl("camera?action=cleanCam&id="+ id,true,function (value){
 					button.removeClass("loading");
 					timeLineJson="";
 					reloadSpace();
 					loadStoreCamera(true);	
+					$('#purgeCounter').html(value+ "  purged file(s).");
+					$('#purgeCount').modal('show');
 				});
 			});
 			
@@ -129,21 +180,88 @@
 					button.removeClass("loading");	
 				});
 			});
-							
+			
+			function displayTime()
+			{
+				$("#time").html(new Date().toLocaleDateString(undefined, options) );
+			}
+			
+			function setNightMode(nightMode)
+			{
+				nightMode=nightMode;
+				if ( nightMode == 1 )
+				 {
+					$('body').css("background-color","black");
+					$('#cameraHeader').css("background-color","black");
+					$('#fond').css("background-color","black");
+					$('#camContent').css("background-color","black");
+					$('#loadMore').css("background-color","black");
+					$('#spaceBlock').css("background-color","black");
+					$('#spaceMemory').css("background-color","black");
+					$('#memoryColor').css("color","white");
+					$('#spaceColor').css("color","white");
+					$("body").find(".dateEvt").css("color","white");
+					$('#time').css("color","white");
+				}else
+				{					 
+				    $('body').css("background-color","white");
+					$('#cameraHeader').css("background-color","white");
+					$('#fond').css("background-color","white");
+					$('#camContent').css("background-color","white");
+					$('#loadMore').css("background-color","white");
+					$('#spaceBlock').css("background-color","white");
+					$('#spaceMemory').css("background-color","white");
+					$('#memoryColor').css("color","black");
+					$('#spaceColor').css("color","black");
+					$("body").find(".dateEvt").css("color","black");
+					$('#time').css("color","black");
+				}
+			}
+			
+			function loadCore()
+			{
+				getValueFromUrl("admin?action=getCore",true,function(json){
+											try {
+													core=JSON.parse(json);
+													mute=core.muteMode;
+ 												    nightMode=core.nightMode;
+													$("#paypal").html("<i onclick=javascript:window.open('" + core.paypal + "') id=paypal class=\"paypal icon\"></i>");
+													if ( mute == 1 )
+													{
+														$('#muteCheck').checkbox('set checked');
+													}
+													if ( nightMode == 1)
+													{
+														$('#nightCheck').checkbox('set checked');
+													}
+												} catch (e)
+												{
+													console.log(e);
+												}
+							}
+				);
+			}
 		
+			function garbageTimeCollector()
+			{
+
+				$("body").find(".forceDisplay").show();
+				$("body").find(".waitingPimp").hide();
+				setNightMode(nightMode);
+			}
 			
 			$(window).scroll(function(){
 
 				//console.log("Reload top:" + $(".loadMore").last().offset().top + " scrollTop:" +  $(window).scrollTop() );
 				if ( ($(".loadMore").last().offset().top - 1000)  < $(window).scrollTop())
 				{
-					$("body").find(".forceDisplay").show();
-					$("body").find(".waitingPimp").hide();
 					
 					
 					$(".loadMore").last().remove();
 					console.log("Complete Reload");
 					loadStoreCamera(false);
+					
+					
 				}
 				
     		});
@@ -154,13 +272,13 @@
 					{
 						if ( displayMenu == 0 )
 						{
-							$("#menu").show();
+							//$("#menu").show();
 							$("#menu").transition('fly left');
 							displayMenu=1;
 						}else
 						{
-								$("#menu").hide();
-								$("#menu").transition('slide up')
+								//$("#menu").hide();
+								$("#menu").transition('slide down')
 								displayMenu=0;
 						}
 					});	
@@ -215,6 +333,9 @@
 			getValueFromUrl("camera?action=getTimeLine" + crunch,true,function(json){
 													
 				try {
+					$("body").find(".forceDisplay").show();
+					$("body").find(".waitingPimp").hide();
+					
 					timeLineJson=JSON.parse(json);
 					console.log(timeLineJson);
 					html="<table>";
@@ -222,23 +343,24 @@
 					{
 						html+="<tr>";
 						timeLine=timeLineJson.cameraToMedia[i];
-						for ( k=0;k<timeLineJson.maxColumnDisplay;k++)
+						for ( k=1;k<=timeLineJson.maxColumnDisplay;k++)
 						{
-							if ( typeof timeLine[k] == "undefined"){
-								html+="<td><div style=height:250px;background-color:white;width:100%; /></td>";
+							
+							if ( typeof timeLine[k] == "undefined" ){
+								html+="<td><div class=filler style=background-color:white;width:335px; /></td>";
 							}else
 							{
 								html+="<td >";
-								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;height:250px><i style=z-index:200 class=\"waitingPimp notched circle loading icon\"></i></div>";
+								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;width:335px><i style=z-index:200 class=\"waitingPimp notched circle loading icon\"></i></div>";
 								 if ( timeLine[k].pathToMedia.endsWith("mp4"))
 									{
 										 aDate=new Date(timeLine[k].time);
 									
-										 html += "<div><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
-										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; height=250 controls src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
+										 html += "<div class=dateEvt ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
+										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
 									}else
 									{
-										 html += "<img class=forceDisplay height=250 id=\"" + k + "_" + timeLine[k].time + "\" src=" + timeLine[k].pathToMedia + "\"/>";										
+										 html += "<img class=forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=" + timeLine[k].pathToMedia + "\"/>";										
 									}
 								html+="</td>";
 								//console.log(timeLine[k]);
@@ -248,13 +370,13 @@
 					}
 					if ( redraw) 
 					{
-											$("#camContent").html(html + "</table><div class=\"ui segment loadMore\" style=width:100%;height:100px></div>");
+											$("#camContent").html(html + "</table><div id=loadMore class=\"ui segment loadMore\" style=width:100%;height:100px></div>");
 					}else
 					{
-											$("#camContent").append(html + "</table><div class=\"ui segment loadMore\" style=width:100%;height:100px></div>");						
+											$("#camContent").append(html + "</table><div id=loadMore class=\"ui segment loadMore\" style=width:100%;height:100px></div>");						
 					}
 
-					
+					setNightMode(nightMode);
 				} catch (e)
 				{
 					console.log(e);
@@ -287,7 +409,7 @@
 							html+="<button id=\"" + camera.name + "\" class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i>Seek</button>";
 							html+="<button id=\"" + camera.name + "\" class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i>Purge Files</button>";
 							html+="<button class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Settings</a></button>";
-							html+="<br><a target=new href=http://" + ip +":" + camera.broadcastPort + " ><img style=border-radius:5px;z-index:1000 height=250px src=http://" + ip +":" + camera.broadcastPort+"/></a>"
+							html+="<br><a target=new href=/stream?url=http://" + ip +":" + camera.broadcastPort + " ><img id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?url=http://" + ip +":" + camera.broadcastPort+"/></a>"
 						html+="</td>";
 					}
 					$("#cameraHeader").html(html + "</tr></table>");
@@ -382,17 +504,17 @@
    	</head>
 	<body id=body>
 	
-		<div class=memory style=position:fixed;top:0px;width:100%;z-index:1000>
+		<div id=memoryBlock class=memory style=position:fixed;top:0px;width:100%;z-index:1000>
 		    <div id=memory style=width:100% class="ui tiny indicating progress">
 	  			<div class="bar"></div>
-	  			<div style="color:black;" class="label">Memory</div>
+	  			<div id=memoryColor style="color:black;" class="label">Memory</div>
 			</div>
 		</div>
 		
-		<div class=memory style=position:fixed;bottom:1px;height:40px;width:100%;z-index:1000;background-color:white>
+		<div id=spaceBlock class=memory style=position:fixed;bottom:1px;height:40px;width:100%;z-index:1000;background-color:white>
 		    <div id=space style=width:100% class="ui tiny indicating progress">
 	  			<div class="bar"></div>
-	  			<div style="color:black;" class="label">Space</div>
+	  			<div id=spaceColor style="color:black;" class="label">Space</div>
 			</div>
 		</div>
 	
@@ -402,7 +524,7 @@
 		
 		
 		
-		<div id=menu style=display:none;position:fixed;z-index:2000;right:-4px;top:42px class="ui compact vertical labeled icon menu">
+		<div id=menu style=display:none;position:fixed;z-index:2000;right:-4px;top:42px; class="ui compact vertical labeled icon menu">
 			  <a class="item">
 			    <i id=setPath class="home icon"></i>
 			    Set kerberos.io path
@@ -423,6 +545,25 @@
 				<i onclick=javascript:window.open('admin?action=getLogs') id=logs class="archive icon"></i>
 			   	Logs
 			  </a>
+	 		  <a class="item">
+					<div style=position:absolute;left:3px id=muteCheck class="ui toggle checkbox">
+					  <input type="checkbox" name="public">
+					  <label>Mute</label>
+					</div>
+										<br><br>
+			  </a>
+	 		  <a class="item">
+					<div style=position:absolute;left:3px id=nightCheck class="ui toggle checkbox">
+					  <input type="checkbox" name="public">
+					  <label>Night mode</label>
+					</div>
+					<br><br>
+			  </a>
+			<a id=paypal class="item">
+				
+ 		    </a>
+				
+	
 			  <a class="item">
 			    <i id=logout class="power off icon"></i>
 			    Logout
@@ -431,7 +572,7 @@
 		
 		
 	
-		
+		<div id=time style=position:fixed;z-index:1000;top:15px;right:250px;color:white></div> 
 		<div style=position:fixed;z-index:1000;top:5px;right:50px class="ui calendar" >
 			    <div class="ui input left icon">
 			      <i class="calendar icon"></i>
@@ -442,7 +583,7 @@
 
  			
 
-<div id=cameraHeader style=position:fixed;z-index:1000;top:40px;margin-left:20px;margin-right:20px;width:100%>
+<div id=cameraHeader style=position:fixed;z-index:1000;top:42px;margin-left:20px;margin-right:20px;width:100%>
 
 </div>
 
@@ -453,7 +594,7 @@
 	
 
 
-<div id=camContent style=position:relative;top:350px;margin-left:20px;margin-right:20px;width:100%;left:-3px;height:100%;background-color:white; >
+<div id=camContent style=position:relative;top:350px;margin-left:25px;margin-right:24px;width:100%;left:-3px;height:100%;background-color:white; >
   
 </div>
 	
@@ -516,28 +657,30 @@
     </div>
   </div>
 </div>
-	
-<div style=position:fixed;display:none;bottom:50px;right:10px;z-index:3000;width:300px;background-color:#DFDFDF;border-radius:5px; id=reloadMessage class="card">
-    <div class="content">
-      <img id=messageImage class="right floated mini ui image" src="">
-      <div class="header">
-        New Detection
-      </div>
-      <div class="meta">
-        Something is moving
-      </div>
-      <div class="description">
-        <div id=messageDetail></div>
-      </div>
+
+
+<div style=position:fixed;display:none;bottom:45px;right:5px;z-index:3000;width:400px;border-radius:5px; id=reloadMessage class="ui icon message">
+  <i class="eye icon"></i>
+  <div class="content">
+    <div class="header">
+      New Detection
     </div>
-    <div class="extra content">
-      <div class="ui three buttons">
-        <div class="ui basic green button">Reload</div>
-        <div class="ui basic orange button">Mute</div>
-        <div class="ui basic red button">Decline</div>
-      </div>
-    </div>
+    <p><div id=messageDetail>Detection from camera_allee</div></p>
+	<div id=reloadButton class="ui basic green button">Reload</div>
+	<div id=muteButton class="ui basic orange button">Mute</div>
+	<div id=declineButton class="ui basic red button">Decline</div>
   </div>
+</div>
+
+<div id=purgeCount class="tiny ui modal">
+  <div class="header">Purge</div>
+  <div class="content">
+    <p><div id=purgeCounter></div></p>
+  </div>
+  <div class="actions">
+    <div class="ui approve button">Approve</div>
+  </div>
+</div>
 
 	
 </body>

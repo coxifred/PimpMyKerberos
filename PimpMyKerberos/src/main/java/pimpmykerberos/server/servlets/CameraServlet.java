@@ -136,7 +136,12 @@ public class CameraServlet extends AbstractServlet {
 		User requester = (User) request.getSession().getAttribute("USER");
 		if (requester != null) {
 			if (requester.getName().equals("admin")) {
-				response.getWriter().write(Core.getInstance().cleanAll());
+				try {
+  				    Integer count=Core.getInstance().cleanAll();
+					response.getWriter().write(count.toString());
+				} catch (IOException e) {
+					 Fonctions.trace("ERR", "Couldn't clean all cam", "CameraServlet");
+				}
 			}
 		}
 		
@@ -150,7 +155,8 @@ public class CameraServlet extends AbstractServlet {
 				if ( idCam != null )
 				{
 				 try{
-					 response.getWriter().write(Core.getInstance().cleanCamera(idCam));
+					 Integer count=Core.getInstance().cleanCamera(idCam);
+					 response.getWriter().write(count.toString());
 				 }catch (Exception e)
 				 {
 					 Fonctions.trace("ERR", "Couldn't clean idCam " + idCam, "CameraServlet");
@@ -167,7 +173,7 @@ public class CameraServlet extends AbstractServlet {
 			if (requester.getName().equals("admin")) {
 				String path = request.getParameter("path");
 				Core.getInstance().setKerberosioPath(path);
-				Core.getInstance().computeKerberosioPath();
+				Core.getInstance().computeKerberosioPath(true);
 				Core.getInstance().saveCore();
 			}
 		}

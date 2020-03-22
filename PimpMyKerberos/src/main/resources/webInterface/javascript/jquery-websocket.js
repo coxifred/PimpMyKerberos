@@ -6,6 +6,8 @@ new function() {
 	var connectionStatus;
 	var sendMessage;
 	
+	
+	
 	var open = function(url) {
 		ws = new WebSocket(url);
 		ws.onopen = onOpen;
@@ -40,6 +42,11 @@ new function() {
 	
 	
 	var onMessage = function(event) {
+		console.log("Mute = " + mute );
+		if ( mute == 0 ) 
+		{
+			
+		
 		var data = event.data;
 		try
 		{
@@ -60,7 +67,7 @@ new function() {
 		{
 			console.log("Something wrong with parsing jsonMessage " + data);
 		}
-		
+		}
 	};
 	
 	var onError = function(event) {

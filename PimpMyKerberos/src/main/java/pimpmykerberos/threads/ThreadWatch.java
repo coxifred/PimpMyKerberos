@@ -10,7 +10,7 @@ public class ThreadWatch extends Thread {
 		setName("ThreadWatch");
 		while (true) {
 			Fonctions.trace("DBG", "Kerberos analysis", "ThreadWatch");
-			Core.getInstance().computeKerberosioPath();
+			Core.getInstance().computeKerberosioPath(true);
 			Fonctions.attendre(Core.getInstance().getTimeBetweenScan());
 	
 		}

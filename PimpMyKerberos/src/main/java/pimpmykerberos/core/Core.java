@@ -124,6 +124,16 @@ public class Core {
 	Integer maxDisplayColumnInGUI=6;
 	
 	/**
+	 * Mode nuit pour IHM
+	 */
+	Integer nightMode=0;
+	
+	/**
+	 * Mute all message on IHM
+	 */
+	Integer muteMode=0;
+	
+	/**
 	 * A Docker Compose
 	 */
 	transient DockerCompose dockerCompose;
@@ -149,6 +159,8 @@ public class Core {
 	 * Logs
 	 */
 	transient List<Log> logs = new ArrayList<Log>();
+	
+
 
 	/**
 	 * Datapath
@@ -170,11 +182,12 @@ public class Core {
 		// Loading plugins
 		loadPlugin();
 
+		computeKerberosioPath(false);
 		/**
 		 * Starting webserver
 		 */
 		ws = new Webserver();
-
+		
 		Fonctions.trace("INF", "Starting webserver on port " + getWebServerPort(), "CORE");
 		ws = new Webserver();
 		if (getWebServerIp() == null) {
@@ -403,7 +416,7 @@ public class Core {
 		this.coreFile = coreFile;
 	}
 
-	public void computeKerberosioPath() {
+	public void computeKerberosioPath(Boolean clean) {
 		// Try to deserialize docker-compose.yml
 		File aDockerComposeFile = new File(getKerberosioPath() + "/docker-compose.yml");
 
@@ -428,7 +441,10 @@ public class Core {
 				if ( Core.getInstance().getUsers().get("admin").getCameras().containsKey(aCamera.getName()))
 				{
 					aCamera=Core.getInstance().getUsers().get("admin").getCameras().get(aCamera.getName());
+					if ( clean )
+					{
 					aCamera.clean();
+					}
 				}else
 				{
 					aCamera.setDaysBeforePurge(Core.getInstance().getDaysBeforePurge());
@@ -574,6 +590,30 @@ public class Core {
 		return Long.MAX_VALUE;	
 		}
 		
+	}
+
+	public Integer getNightMode() {
+		return nightMode;
+	}
+
+	public void setNightMode(Integer nightMode) {
+		this.nightMode = nightMode;
+	}
+
+	public Integer getMuteMode() {
+		return muteMode;
+	}
+	String paypal="https://paypal.me/FredericCOSTANT/2";
+	public void setMuteMode(Integer muteMode) {
+		this.muteMode = muteMode;
+	}
+
+	public String getPaypal() {
+		return paypal;
+	}
+
+	public void setPaypal(String paypal) {
+		this.paypal = paypal;
 	}
 
 }
