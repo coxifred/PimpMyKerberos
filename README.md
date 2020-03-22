@@ -1,4 +1,4 @@
-![PimpMyKerberos](https://github.com/coxifred/pimpMyKerberos/blob/master/resources/pimpMyKerberos.jpg?raw=true)
+<p align="center"><img src="https://github.com/coxifred/pimpMyKerberos/blob/master/resources/pimpMyKerberos.jpg?raw=true" height=300 ></p>
 
 _Timing Correlation between VideoCam (based on Kerberos.io)_
 
@@ -7,3 +7,52 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
   * [Requirements](#chapter-2)
   * [Installations](#chapter-3)
   * [Configuration](#chapter-4)
+
+## Under the hood <a name="chapter-1"></a>
+
+**pimpMyKerberos** is a small footprint java (jetty) server which unify all your cameras in one single interface. As [Kerberos.io](https://kerberos.io), it displays your captures with chronology, but this time will all cameras time-synchronized (Interesting if you want to correlate some events on multiple locations). **pimpMyKerberos** scans capture's directories and sort files by time. Also works with every CCTV system which dump pictures or mp4 captures. **pimpMyKerberos** provides an https access broadcasting your local network cameras.
+
+What **pimpMyKerberos** doesn't do:
+  
+   * It doesn't connect directly to your cameras, but only provides pictures/movies made by Kerberos.io
+ 
+## Requirements <a name="chapter-2"></a>
+
+- [x] Cameras :)
+- [x] Kerberos.io (docker mode with docker-compose)
+- [x] Java JDK version >= 9
+- [x] Directory structure
+
+## Installations <a name="chapter-3"></a>
+  
+ Before install, check that you will respect the following tree structure (volumes provided to kerberos.io container). If you don't have yet configure your docker, download this [docker-compose.yml](https://github.com/coxifred/pimpMyKerberos/blob/master/resources/docker-compose.yml).
+  
+  ```bash
+      "camera1":
+      ...
+      volumes:
+      - /kerberos/<your_cam1>/capture:/etc/opt/kerberosio/capture
+      - /kerberos/<your_cam1>/config:/etc/opt/kerberosio/config
+      - /kerberos/<your_cam1>/logs:/etc/opt/kerberosio/logs
+      - /kerberos/<your_cam1>/webconfig:/var/www/web/config
+      
+      "camera2":
+      ...
+      volumes:
+      - /kerberos/<your_cam2>/capture:/etc/opt/kerberosio/capture
+      - /kerberos/<your_cam2>/config:/etc/opt/kerberosio/config
+      - /kerberos/<your_cam2>/logs:/etc/opt/kerberosio/logs
+      - /kerberos/<your_cam2>/webconfig:/var/www/web/config
+  ```
+  
+  * 2 install modes (Choose one):
+  
+  1. As java server over docker (running on the host)
+  
+  2. As docker container.
+
+## Configuration <a name="chapter-4"></a>
+
+  1. For java server over docker (running on the host)
+  
+  2. As docker container
