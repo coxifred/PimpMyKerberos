@@ -8,7 +8,7 @@
   <debugJetty>false</debugJetty>
   <adminPassword>admin</adminPassword>
   <maxLogEntries>1000</maxLogEntries>
-  <kerberosioPath>Z:\kerberos.io</kerberosioPath>
+  <kerberosioPath>../kerberos.io</kerberosioPath>
   <maxDisplayLineInGUI>5</maxDisplayLineInGUI>
   <maxDisplayColumnInGUI>6</maxDisplayColumnInGUI>
   <http2>true</http2>
@@ -20,34 +20,7 @@
         <description>Administrator</description>
         <name>admin</name>
         <password>admin</password>
-        <cameras>
-          <entry>
-            <string>camera_allee</string>
-            <pimpmykerberos.beans.Camera>
-              <name>camera_allee</name>
-              <capturePath>Z:\kerberos.io\camera_allee/capture</capturePath>
-              <ip>192.168.2.50</ip>
-              <kerberosPort>80</kerberosPort>
-              <daysBeforePurge>15</daysBeforePurge>
-              <broadcastPort>8889</broadcastPort>
-              <freshDate>2020-03-21 12:48:40.578 UTC</freshDate>
-            </pimpmykerberos.beans.Camera>
-          </entry>
-          <entry>
-            <string>camera_entree</string>
-            <pimpmykerberos.beans.Camera>
-              <name>camera_entree</name>
-              <capturePath>Z:\kerberos.io\camera_entree/capture</capturePath>
-              <ip>192.168.2.50</ip>
-              <kerberosPort>81</kerberosPort>
-              <daysBeforePurge>15</daysBeforePurge>
-              <broadcastPort>8890</broadcastPort>
-              <freshDate>2020-03-21 10:26:23.315 UTC</freshDate>
-            </pimpmykerberos.beans.Camera>
-          </entry>
-        </cameras>
       </pimpmykerberos.beans.User>
     </entry>
   </users>
-  <dataPath></dataPath>
 </pimpmykerberos.core.Core>
