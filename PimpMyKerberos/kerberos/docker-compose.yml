@@ -1,0 +1,54 @@
+version: "2"
+services:
+  "camera1_name":
+    image: "kerberos/kerberos"
+    container_name: "camera1_name"
+    restart: always
+    ports:
+      - "80:80"
+      - "8889:8889"
+    volumes:
+      - /kerberos/camera1_name/capture:/etc/opt/kerberosio/capture
+      - /kerberos/camera1_name/config:/etc/opt/kerberosio/config
+      - /kerberos/camera1_name/logs:/etc/opt/kerberosio/logs
+      - /kerberos/camera1_name/webconfig:/var/www/web/config
+
+  "camera2_name":
+    image: "kerberos/kerberos"
+    container_name: "camera2_name"
+    restart: always
+    ports:
+      - "81:80"
+      - "8890:8889"
+    volumes:
+      - /kerberos/camera2_name/capture:/etc/opt/kerberosio/capture
+      - /kerberos/camera2_name/config:/etc/opt/kerberosio/config
+      - /kerberos/camera2_name/logs:/etc/opt/kerberosio/logs
+      - /kerberos/camera2_name/webconfig:/var/www/web/config
+
+  "camera3_name":
+    image: "kerberos/kerberos"
+    container_name: "camera3_name"
+    restart: always
+    ports:
+      - "82:80"
+      - "8891:8889"
+    volumes:
+      - /kerberos/camera3_name/capture:/etc/opt/kerberosio/capture
+      - /kerberos/camera3_name/config:/etc/opt/kerberosio/config
+      - /kerberos/camera3_name/logs:/etc/opt/kerberosio/logs
+      - /kerberos/camera3_name/webconfig:/var/www/web/config
+
+  "camera4_name":
+    image: "kerberos/kerberos"
+    container_name: "camera4_name"
+    restart: always
+    ports:
+      - "83:80"
+      - "8892:8889"
+    volumes:
+      - /kerberos/camera4_name/capture:/etc/opt/kerberosio/capture
+      - /kerberos/camera4_name/config:/etc/opt/kerberosio/config
+      - /kerberos/camera4_name/logs:/etc/opt/kerberosio/logs
+      - /kerberos/camera4_name/webconfig:/var/www/web/config
+
