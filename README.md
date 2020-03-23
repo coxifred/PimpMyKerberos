@@ -12,6 +12,8 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
 
 **pimpMyKerberos** is a small footprint java (jetty) server which unify all your cameras in one single interface. As [Kerberos.io](https://kerberos.io), it displays your captures with chronology, but this time will all cameras time-synchronized (Interesting if you want to correlate some events on multiple locations). **pimpMyKerberos** scans capture's directories and sort files by time. Also works with every CCTV system which dump pictures or mp4 captures. **pimpMyKerberos** provides an https access broadcasting your local network cameras.
 
+<p align="center"><img src=https://github.com/coxifred/pimpMyKerberos/blob/master/resources/infra.jpg?raw=true /></p>
+
 What **pimpMyKerberos** doesn't do:
   
    * It doesn't connect directly to your cameras, but only provides pictures/movies made by Kerberos.io
@@ -19,8 +21,8 @@ What **pimpMyKerberos** doesn't do:
 ## Requirements <a name="chapter-2"></a>
 
 - [x] Cameras :)
+- [x] Linux distribution
 - [x] Kerberos.io (docker mode with docker-compose)
-- [x] Java JDK version >= 9
 - [x] Directory structure
 
 ## Installations <a name="chapter-3"></a>
@@ -47,12 +49,37 @@ What **pimpMyKerberos** doesn't do:
   
   * 2 install modes (Choose one):
   
-  1. As java server over docker (running on the host)
+  1. As docker container (fastest)
   
-  2. As docker container.
+  2. As java server over docker (running on the host)
+  
+  Extra requirements:
+  
+  - [x] Java JDK version >= 1.8 (**yum install java-1.8.0-openjdk-devel**)
+  - [x] Git client (**yum install git**)
+  
+  Download project
+  ```bash
+  git clone https://github.com/coxifred/pimpMyKerberos.git
+  cd pimpMyKerberos/PimpMyKerberos
+  ```
+  Check java version
+  ```bash
+  [root@localhost PimpMyKerberos]# java -version
+  openjdk version "1.8.0_242"
+  OpenJDK Runtime Environment (build 1.8.0_242-b08)
+  OpenJDK 64-Bit Server VM (build 25.242-b08, mixed mode)
+  ```
+  Build project
+  ```bash
+  chmod a+x ./gradlew ; ./gradlew fatJar
+  # Jar is generated under build/libs with name PimpMyKerberos.jar
+  ```
 
 ## Configuration <a name="chapter-4"></a>
 
-  1. For java server over docker (running on the host)
+  1. As docker container
+
+  2. For java server over docker (running on the host)
   
-  2. As docker container
+  
