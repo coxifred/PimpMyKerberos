@@ -1,5 +1,6 @@
 package pimpmykerberos.beans;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import pimpmykerberos.core.Core;
 import pimpmykerberos.utils.Fonctions;
@@ -38,6 +40,7 @@ public class TimeLine {
 
 	public Crunch extract(String startCrunch, String size) {
 		Crunch aCrunch = new Crunch();
+		aCrunch.setId(UUID.randomUUID().toString());
 		aCrunch.setMaxLineDisplay(Core.getInstance().getMaxDisplayLineInGUI());
 		aCrunch.setMaxColumnDisplay(Core.getInstance().getMaxDisplayColumnInGUI());
 		if (timeToMedia.size() > 0) {
@@ -69,6 +72,25 @@ public class TimeLine {
 					{
 						aCrunch.setStartCrunch(aLong);
 					}
+					// Check if file still exists
+					Map<Integer,Media> check=timeToMedia.get(aLong);
+					List<Integer> toClean=new ArrayList<Integer>();
+					for ( Integer aMediaInt:check.keySet())
+					{
+						Media aMedia=check.get(aMediaInt);
+						File aMediaToCheck=new File(aMedia.pathToMedia);
+						if ( ! aMediaToCheck.exists())
+						{
+							Fonctions.trace("ERR", "File " + aMedia.pathToMedia + " is no more present, clean from memory", "TimeLine");
+							toClean.add(aMediaInt);
+						}
+					}
+					
+					for ( Integer aIntToDelete:toClean)
+					{
+						check.remove(aIntToDelete);
+					}
+					
 					cameraToMedia.add(timeToMedia.get(aLong));
 					aCrunch.setEndCrunch(aLong);
 					currentSize++;

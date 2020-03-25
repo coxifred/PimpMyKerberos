@@ -32,6 +32,8 @@ public class Camera {
 				timeToFile.put(aFile.lastModified(), aFile.getAbsolutePath());
 				i++;
 			}
+			if ( timeToFile.size() > 0)
+			{
 			Date lateDate = new Date(timeToFile.firstKey());
 			Date aNewfreshDate = new Date(timeToFile.lastKey());
 			if (freshDate != null && aNewfreshDate.getTime() > freshDate.getTime()) {
@@ -45,6 +47,7 @@ public class Camera {
 			freshDate = aNewfreshDate;
 			Fonctions.trace("DBG",
 					"Camera " + getName() + " has " + i + " entries from " + lateDate + " to " + freshDate, "Camera");
+			}
 		} else {
 			Fonctions.trace("ERR", capturePath + " doesn't exist or not a directory", "Camera");
 		}
@@ -160,7 +163,7 @@ public class Camera {
 						FileUtils.forceDelete(aFile);
 						count++;
 					} catch (IOException e) {
-						Fonctions.trace("ERR", "Can't clean " + aFile.getAbsolutePath() + " " + e.getMessage(),
+						Fonctions.trace("ERR", "Can't clean " + aFile.getAbsolutePath() + " " + e.getMessage() + " perhaps you reach 90% of disk usage, kerberos.io don't like it",
 								"Camera");
 					}
 				}

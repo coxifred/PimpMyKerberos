@@ -16,6 +16,12 @@
 		var nightMode=0;
 		var core;
 		var mute=0;
+		var timeLineId=1;
+		var lastScrollTop = 0;
+		
+		// Affichage peripheriques des videos, on chargera les x timeline au dessus et en dessous, les autres seront mises à src="" pour décharger la mémoire
+		var peripheralDisplay=3;
+
 		const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour :'numeric', minute:'numeric',second: 'numeric' };
 		
 		function display(id){
@@ -250,22 +256,99 @@
 				setNightMode(nightMode);
 			}
 			
-			$(window).scroll(function(){
-
-				//console.log("Reload top:" + $(".loadMore").last().offset().top + " scrollTop:" +  $(window).scrollTop() );
-				if ( ($(".loadMore").last().offset().top - 1000)  < $(window).scrollTop())
-				{
-					
-					
-					$(".loadMore").last().remove();
-					console.log("Complete Reload");
-					loadStoreCamera(false);
-					
-					
-				}
-				
-    		});
+			function distance(element){
+				var mustBeLoad=new Array();
+				try {
+					 var scroll = parseInt(jQuery( "body" ).scrollTop());
+					  var win_height = parseInt(jQuery( window ).height());
+					  var win= parseInt(win_height+scroll);
+					  var elem=parseInt(parseInt(jQuery("#" + element).offset().top) + parseInt(jQuery("#" + element).css("height"))) ;
+					  //console.log(element + " win=" + win + " elem=" + elem + " win_height=" + win_height);
+					  return (Math.abs(elem - win));
 			
+			
+					} catch (e)
+					{
+					  console.log(e);
+					}
+					return  9999999999;
+					  //if (win<elem) {
+			}
+			
+			window.addEventListener('mousewheel', function(e){
+				    wDelta = e.wheelDelta < 0 ? 'down' : 'up';
+				    console.log(wDelta);
+					// Looking for the nearest element
+					minDistance=9999999999;
+					nearest=1;
+					$(body).find(".loadMore").each(function (i){
+						id=$(this).attr("id");
+						name=$(this).attr("name");
+						aDistance=distance(id);
+						//console.log("id:" + id + " distance from scroll " + aDistance);
+						if ( aDistance < minDistance)
+						 {
+						  minDistance=aDistance;
+				          nearest=name;
+						 }
+					});
+					
+					console.log("Nearest is " + nearest );
+					loadNearest(nearest);
+					
+					if ( ($(".loadMore").last().offset().top - 1000)  < $(window).scrollTop())
+					{
+							
+								
+								console.log("Complete Reload and timeLineId " + timeLineId);
+								loadStoreCamera(false);
+								/*
+								var previous=timeLineId - 1;
+								$('.timeLine' + previous).each(function(num,val){
+			   						 $(this).attr('name', $(this).attr('src'));
+								     $(this).attr('src', '')
+								});
+								*/
+							}
+						
+						//$(".loadMore").last().remove();
+					
+					
+					});
+			
+				function loadNearest(nearest)
+				{
+					nearest=parseInt(nearest);
+					var minElement=parseInt(parseInt(nearest) - parseInt(peripheralDisplay));
+					var maxElement=parseInt(parseInt(nearest) + parseInt(peripheralDisplay));
+					
+					if ( minElement < 0) minElement =0;
+					
+					console.log("minElement=" + minElement + " maxElement=" + maxElement);
+					for ( i=0;i<1000;i++)
+					{
+						if ( typeof $('.timeLine' + i) == "undefined" )
+						 {
+						   break;	
+						 }
+						if ( i >= minElement && i <= maxElement)
+						{
+							$('.timeLine' + i).each(function(num,val){
+			   						 $(this).attr('src', $(this).attr('name'));
+									 console.log("Load video for " + i);
+								});	
+						}else
+						{
+							$('.timeLine' + i).each(function(num,val){
+								     $(this).attr('src', '')
+									console.log("UnLoad video for " + i);
+								});	
+						}
+						
+					}
+					
+				
+				}
 			
 			
 				$("#menuDisplay").click(function(e)
@@ -352,14 +435,15 @@
 							{
 								html+="<td >";
 								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;width:335px><i style=z-index:200 class=\"waitingPimp notched circle loading icon\"></i></div>";
-								 if ( timeLine[k].pathToMedia.endsWith("mp4"))
+								 if ( timeLine[k].pathToMedia.endsWith(".mp4"))
 									{
 										 aDate=new Date(timeLine[k].time);
 									
 										 html += "<div class=dateEvt ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
-										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
-									}else
+										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
+									}else if (timeLine[k].pathToMedia.endsWith(".jpg"))
 									{
+										 
 										 html += "<img class=forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=" + timeLine[k].pathToMedia + "\"/>";										
 									}
 								html+="</td>";
@@ -368,13 +452,14 @@
 						}						
 					html+="</tr>";
 					}
-					if ( redraw) 
-					{
-											$("#camContent").html(html + "</table><div id=loadMore class=\"ui segment loadMore\" style=width:100%;height:100px></div>");
-					}else
-					{
-											$("#camContent").append(html + "</table><div id=loadMore class=\"ui segment loadMore\" style=width:100%;height:100px></div>");						
-					}
+					//if ( redraw) 
+					//{
+					//						$("#camContent").html(html + "</table><div id=loadMore class=\"ui segment loadMore\" style=width:100%;height:100px></div>");
+					//}else
+					//{
+											$("#camContent").append(html + "</table><div name=" + timeLineId + " id=timeLineId" + timeLineId + " class=\"ui segment loadMore\" style=width:100%;height:100px>" + timeLineId +"</div>");
+											timeLineId++;						
+					//}
 
 					setNightMode(nightMode);
 				} catch (e)
@@ -441,6 +526,7 @@
 					try{
 						memories=JSON.parse(memory);
 						percent=parseFloat(memories.used) * 100 / parseFloat(memories.max);
+						
 						//console.log(percent + " " +memories.used + " " + memories.max);
 						used=parseFloat(memories.used) * 1024;
 						total=parseFloat(memories.max) * 1024;
@@ -472,6 +558,14 @@
 					try{
 						spaces=JSON.parse(space);
 						percent=parseFloat(spaces.used) * 100 / parseFloat(spaces.max);
+						if ( percent >= 90 )
+						{
+							$("#spaceWarn").show();
+							
+						}else
+						{
+							$("#spaceWarn").hide();
+						}
 						//console.log(percent + " " +memories.used + " " + memories.max);
 						used=parseFloat(spaces.used);
 						total=parseFloat(spaces.max);
@@ -517,6 +611,11 @@
 	  			<div id=spaceColor style="color:black;" class="label">Space</div>
 			</div>
 		</div>
+	
+		 <div id=spaceWarn style=display:none;position:fixed;bottom:25px;height:25px;right:2px;z-index:1000; class="tiny ui red basic label">
+      					Kerberos.io starts going mad by deleting all files because you're upper 90%, make some clean
+    	 </div>
+	
 	
 		<button id=menuDisplay style=position:fixed;z-index:2000;right:-4px;top:0px class="big ui icon button">
   			<i class="bars icon"></i>

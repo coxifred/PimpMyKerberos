@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Crunch {
 
+	String id;
 	List<Map<Integer,Media>> cameraToMedia;
 	Integer maxLineDisplay=5;
 	Integer maxColumnDisplay=6;
@@ -48,6 +49,12 @@ public class Crunch {
 	}
 	public void setMaxColumnDisplay(Integer maxColumnDisplay) {
 		this.maxColumnDisplay = maxColumnDisplay;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 	
