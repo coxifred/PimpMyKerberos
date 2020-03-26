@@ -73,12 +73,12 @@ public class Core {
 	 * Debug mode
 	 */
 	Boolean debug = false;
-	
+
 	/**
 	 * Time between camera scanning from kerberos.io
 	 */
-	Integer timeBetweenScan=60000;
-	
+	Integer timeBetweenScan = 60000;
+
 	/**
 	 * Debug mode
 	 */
@@ -105,37 +105,37 @@ public class Core {
 	 * Top Path of kerberosio
 	 */
 	String kerberosioPath = "";
-	
+
 	/**
-	 * timeLine 
+	 * timeLine
 	 */
 	transient TimeLine timeline;
-	
+
 	/*
 	 * Max lines for camera
 	 */
-	Integer maxDisplayLineInGUI=10;
-	
+	Integer maxDisplayLineInGUI = 10;
+
 	/**
 	 * Default max keep day for files (all cam)
 	 */
-	Integer daysBeforePurge=30;
-	
+	Integer daysBeforePurge = 30;
+
 	/**
 	 * Max column to display
 	 */
-	Integer maxDisplayColumnInGUI=6;
-	
+	Integer maxDisplayColumnInGUI = 6;
+
 	/**
 	 * Mode nuit pour IHM
 	 */
-	Integer nightMode=0;
-	
+	Integer nightMode = 0;
+
 	/**
 	 * Mute all message on IHM
 	 */
-	Integer muteMode=0;
-	
+	Integer muteMode = 0;
+
 	/**
 	 * A Docker Compose
 	 */
@@ -162,8 +162,6 @@ public class Core {
 	 * Logs
 	 */
 	transient List<Log> logs = new ArrayList<Log>();
-	
-
 
 	/**
 	 * Datapath
@@ -190,39 +188,41 @@ public class Core {
 		 * Starting webserver
 		 */
 		ws = new Webserver();
-		
+
 		Fonctions.trace("INF", "Starting webserver on port " + getWebServerPort(), "CORE");
 		ws = new Webserver();
 		if (getWebServerIp() == null) {
-			 Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-			 Fonctions.trace("INF", "Looking network interface <> 127.0.0.1 (can be tuned by adding this line <webServerIp>your_ip</webServerIp> in aCore.xml", "CORE");
-			 Boolean found=false;
-		        for (NetworkInterface netint : Collections.list(nets))
-		        {
-		        	Fonctions.trace("INF", "Watching under physical interface " + netint.getDisplayName(), "CORE");
-		        	Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-		            for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-		            	Fonctions.trace("INF", "IP available " + inetAddress, "CORE");
-		            	if ( ! ("/127.0.0.1").equals(inetAddress.toString()) && ! ("/0:0:0:0:0:0:0:1").equals(inetAddress.toString()) && ! inetAddress.toString().contains(":") )
-		            	{
-		            		Fonctions.trace("INF", "Found interesting ip " + inetAddress, "CORE");
-		            		ws.setIp(inetAddress.getLocalHost().getHostAddress());
-		            		found=true;
-		            		break;
-		            	}else
-		            	{
-		            		Fonctions.trace("WNG", "Ip not interesting " + inetAddress, "CORE");
-		            	}
-		                
-		            }
-		            if ( found )
-		            {
-		             break;
-		            }
-		        }
-			
-			
-			
+			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+			Fonctions.trace("INF",
+					"Looking network interface <> 127.0.0.1 (can be tuned by adding this line <webServerIp>your_ip</webServerIp> in aCore.xml",
+					"CORE");
+			Boolean found = false;
+			for (NetworkInterface netint : Collections.list(nets)) {
+				Fonctions.trace("INF", "Watching under physical interface " + netint.getDisplayName(), "CORE");
+				if (!netint.getDisplayName().contains("docker")) {
+					Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+					for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+						Fonctions.trace("INF", "IP available " + inetAddress, "CORE");
+						if (!("/127.0.0.1").equals(inetAddress.toString())
+								&& !("/0:0:0:0:0:0:0:1").equals(inetAddress.toString())
+								&& !inetAddress.toString().contains(":")) {
+							Fonctions.trace("INF", "Found interesting ip " + inetAddress, "CORE");
+							ws.setIp(inetAddress.getLocalHost().getHostAddress());
+							found = true;
+							break;
+						} else {
+							Fonctions.trace("WNG", "Ip not interesting " + inetAddress, "CORE");
+						}
+
+					}
+					if (found) {
+						break;
+					}
+				} else {
+					Fonctions.trace("INF", "It's a docker interface bypass " + netint.getDisplayName(), "CORE");
+				}
+			}
+
 		} else {
 			ws.setIp(getWebServerIp());
 		}
@@ -469,18 +469,16 @@ public class Core {
 				Fonctions.trace("DBG", "Found a camera " + aFile.getName(), "CORE");
 				Camera aCamera = new Camera();
 				aCamera.setName(aFile.getName());
-				if ( Core.getInstance().getUsers().get("admin").getCameras().containsKey(aCamera.getName()))
-				{
-					aCamera=Core.getInstance().getUsers().get("admin").getCameras().get(aCamera.getName());
-					if ( clean )
-					{
-					aCamera.clean();
+				if (Core.getInstance().getUsers().get("admin").getCameras().containsKey(aCamera.getName())) {
+					aCamera = Core.getInstance().getUsers().get("admin").getCameras().get(aCamera.getName());
+					if (clean) {
+						aCamera.clean();
 					}
-				}else
-				{
+				} else {
 					aCamera.setDaysBeforePurge(Core.getInstance().getDaysBeforePurge());
-					Fonctions.trace("INF", "New Camera detected " + aCamera.getName() + " sending message to GUI", "CORE");
-					Message aMessage=new Message();
+					Fonctions.trace("INF", "New Camera detected " + aCamera.getName() + " sending message to GUI",
+							"CORE");
+					Message aMessage = new Message();
 					aMessage.setAction("RELOAD");
 					aMessage.setMessage("New camera detected " + aCamera.getName());
 					AdminWebSocket.broadcastMessage(aMessage);
@@ -507,8 +505,8 @@ public class Core {
 								try {
 									Integer kerberosPort = Integer.decode(Fonctions.getFieldFromString(port, ":", 0));
 									aCamera.setKerberosPort(kerberosPort);
-									Fonctions.trace("INF", "Kerberos port for Camera " + aCamera.getName()
-											+ " will be " + kerberosPort, "CORE");
+									Fonctions.trace("INF", "Kerberos port for Camera " + aCamera.getName() + " will be "
+											+ kerberosPort, "CORE");
 								} catch (Exception e) {
 									Fonctions.trace("WNG", "Error while parsing port line " + port + ", continue",
 											"CORE");
@@ -526,7 +524,7 @@ public class Core {
 				Core.getInstance().getUsers().get("admin").getCameras().put(aCamera.getName(), aCamera);
 			}
 		}
-		TimeLine aTimeLine=new TimeLine();
+		TimeLine aTimeLine = new TimeLine();
 		aTimeLine.populate();
 		Core.getInstance().setTimeline(aTimeLine);
 	}
@@ -587,40 +585,35 @@ public class Core {
 	public void setMaxDisplayColumnInGUI(Integer maxDisplayColumnInGUI) {
 		this.maxDisplayColumnInGUI = maxDisplayColumnInGUI;
 	}
-	
-	public Integer cleanCamera(String cameraId)
-	{
-		User requester=Core.getInstance().getUsers().get("admin");
-		Camera aCamera=requester.getCameras().get(cameraId);
-		if ( aCamera != null )
-		{
+
+	public Integer cleanCamera(String cameraId) {
+		User requester = Core.getInstance().getUsers().get("admin");
+		Camera aCamera = requester.getCameras().get(cameraId);
+		if (aCamera != null) {
 			return aCamera.clean();
 		}
 		return 0;
 	}
 
 	public Integer cleanAll() {
-		User requester=Core.getInstance().getUsers().get("admin");
-		Integer count=0;
-		for ( Camera aCamera:requester.getCameras().values())
-		{
-			count+=aCamera.clean();
+		User requester = Core.getInstance().getUsers().get("admin");
+		Integer count = 0;
+		for (Camera aCamera : requester.getCameras().values()) {
+			count += aCamera.clean();
 		}
 		return count;
 	}
 
 	public Long seekCamera(String cameraId) {
-		User requester=Core.getInstance().getUsers().get("admin");
-		Camera aCamera=requester.getCameras().get(cameraId);
-		if ( aCamera != null )
-		{
+		User requester = Core.getInstance().getUsers().get("admin");
+		Camera aCamera = requester.getCameras().get(cameraId);
+		if (aCamera != null) {
 			return aCamera.seek();
-		}else 
-		{
-			Fonctions.trace("ERR","Couldn't find cameraId " + cameraId ,"Core");
-		return Long.MAX_VALUE;	
+		} else {
+			Fonctions.trace("ERR", "Couldn't find cameraId " + cameraId, "Core");
+			return Long.MAX_VALUE;
 		}
-		
+
 	}
 
 	public Integer getNightMode() {
@@ -634,7 +627,9 @@ public class Core {
 	public Integer getMuteMode() {
 		return muteMode;
 	}
-	String paypal="https://paypal.me/FredericCOSTANT/2";
+
+	String paypal = "https://paypal.me/FredericCOSTANT/2";
+
 	public void setMuteMode(Integer muteMode) {
 		this.muteMode = muteMode;
 	}
