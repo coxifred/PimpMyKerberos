@@ -2,15 +2,17 @@
   <coreFile>./configFile/aCore.xml</coreFile>
   <webServerPort>443</webServerPort>
   <webSocketPort>4430</webSocketPort>
-  <webServerIp>192.168.2.186</webServerIp>
   <debug>true</debug>
   <timeBetweenScan>60000</timeBetweenScan>
   <debugJetty>false</debugJetty>
   <adminPassword>admin</adminPassword>
   <maxLogEntries>1000</maxLogEntries>
-  <kerberosioPath>../kerberos.io</kerberosioPath>
+  <kerberosioPath>/kerberos</kerberosioPath>
   <maxDisplayLineInGUI>5</maxDisplayLineInGUI>
+  <daysBeforePurge>30</daysBeforePurge>
   <maxDisplayColumnInGUI>6</maxDisplayColumnInGUI>
+  <nightMode>0</nightMode>
+  <muteMode>0</muteMode>
   <http2>true</http2>
   <sessionId>0</sessionId>
   <users>
@@ -20,7 +22,63 @@
         <description>Administrator</description>
         <name>admin</name>
         <password>admin</password>
+        <cameras>
+          <entry>
+            <string>camera1_name</string>
+            <pimpmykerberos.beans.Camera>
+              <name>camera1_name</name>
+              <capturePath>/kerberos/camera1_name/capture</capturePath>
+              <kerberosPort>80</kerberosPort>
+              <daysBeforePurge>30</daysBeforePurge>
+              <broadcastPort>8889</broadcastPort>
+              <freshDate>2020-03-26 20:58:29.0 UTC</freshDate>
+            </pimpmykerberos.beans.Camera>
+          </entry>
+          <entry>
+            <string>camera4_name</string>
+            <pimpmykerberos.beans.Camera>
+              <name>camera4_name</name>
+              <capturePath>/kerberos/camera4_name/capture</capturePath>
+              <kerberosPort>83</kerberosPort>
+              <daysBeforePurge>30</daysBeforePurge>
+              <broadcastPort>8892</broadcastPort>
+              <freshDate>2020-03-26 20:58:30.0 UTC</freshDate>
+            </pimpmykerberos.beans.Camera>
+          </entry>
+          <entry>
+            <string>camera3_name</string>
+            <pimpmykerberos.beans.Camera>
+              <name>camera3_name</name>
+              <capturePath>/kerberos/camera3_name/capture</capturePath>
+              <kerberosPort>82</kerberosPort>
+              <daysBeforePurge>30</daysBeforePurge>
+              <broadcastPort>8891</broadcastPort>
+              <freshDate>2020-03-26 20:58:29.0 UTC</freshDate>
+            </pimpmykerberos.beans.Camera>
+          </entry>
+          <entry>
+            <string>kerberos</string>
+            <pimpmykerberos.beans.Camera>
+              <name>kerberos</name>
+              <capturePath>/kerberos/kerberos/capture</capturePath>
+              <daysBeforePurge>30</daysBeforePurge>
+            </pimpmykerberos.beans.Camera>
+          </entry>
+          <entry>
+            <string>camera2_name</string>
+            <pimpmykerberos.beans.Camera>
+              <name>camera2_name</name>
+              <capturePath>/kerberos/camera2_name/capture</capturePath>
+              <kerberosPort>81</kerberosPort>
+              <daysBeforePurge>30</daysBeforePurge>
+              <broadcastPort>8890</broadcastPort>
+              <freshDate>2020-03-26 20:58:29.0 UTC</freshDate>
+            </pimpmykerberos.beans.Camera>
+          </entry>
+        </cameras>
       </pimpmykerberos.beans.User>
     </entry>
   </users>
+  <dataPath></dataPath>
+  <paypal>https://paypal.me/FredericCOSTANT/2</paypal>
 </pimpmykerberos.core.Core>
