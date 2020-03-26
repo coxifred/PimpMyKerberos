@@ -468,7 +468,7 @@ public class Core {
 		// Explore cameras
 		Fonctions.trace("WNG", "Explore cameras under " + getKerberosioPath(), "CORE");
 		Core.getInstance().getUsers().get("admin").getCameras().clear();
-		if (new File(getKerberosioPath()).exists()) {
+		if ( ! new File(getKerberosioPath()).isDirectory()) {
 			Fonctions.trace("ERR", "Path " + getKerberosioPath() + " doesn't exist anymore", "CORE");
 		} else {
 
