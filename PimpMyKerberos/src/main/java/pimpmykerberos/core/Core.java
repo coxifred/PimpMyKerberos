@@ -453,6 +453,7 @@ public class Core {
 		File aDockerComposeFile = new File(getKerberosioPath() + "/docker-compose.yml");
 
 		if (aDockerComposeFile.exists()) {
+			Fonctions.trace("DBG", "docker-compose.yml file exists " + aDockerComposeFile.getAbsolutePath(), "CORE");
 			Yaml yaml = new Yaml(new Constructor(DockerCompose.class));
 
 			try {
@@ -466,69 +467,77 @@ public class Core {
 
 		// Explore cameras
 		Fonctions.trace("WNG", "Explore cameras under " + getKerberosioPath(), "CORE");
-		for (File aFile : new File(getKerberosioPath()).listFiles()) {
-			if (aFile.isDirectory()) {
-				Fonctions.trace("DBG", "Found a camera " + aFile.getName(), "CORE");
-				Camera aCamera = new Camera();
-				aCamera.setName(aFile.getName());
-				if (Core.getInstance().getUsers().get("admin").getCameras().containsKey(aCamera.getName())) {
-					aCamera = Core.getInstance().getUsers().get("admin").getCameras().get(aCamera.getName());
-					if (clean) {
-						aCamera.clean();
-					}
-				} else {
-					aCamera.setDaysBeforePurge(Core.getInstance().getDaysBeforePurge());
-					Fonctions.trace("INF", "New Camera detected " + aCamera.getName() + " sending message to GUI",
-							"CORE");
-					Message aMessage = new Message();
-					aMessage.setAction("RELOAD");
-					aMessage.setMessage("New camera detected " + aCamera.getName());
-					AdminWebSocket.broadcastMessage(aMessage);
-				}
+		Core.getInstance().getUsers().get("admin").getCameras().clear();
+		if (new File(getKerberosioPath()).exists()) {
+			Fonctions.trace("ERR", "Path " + getKerberosioPath() + " doesn't exist anymore", "CORE");
+		} else {
 
-				aCamera.setCapturePath(aFile.getAbsolutePath() + "/capture");
-				if (dockerCompose != null) {
-					// Looking for exposePort
-					Service aService = getServiceFromContainerName(aCamera.getName());
-					if (aService != null) {
-						for (String port : aService.getPorts()) {
-							if (port.endsWith(":8889")) {
-								try {
-									Integer broadCastPort = Integer.decode(Fonctions.getFieldFromString(port, ":", 0));
-									aCamera.setBroadcastPort(broadCastPort);
-									Fonctions.trace("INF", "Broadcast port for Camera " + aCamera.getName()
-											+ " will be " + broadCastPort, "CORE");
-								} catch (Exception e) {
-									Fonctions.trace("WNG", "Error while parsing port line " + port + ", continue",
-											"CORE");
-								}
-							}
-							if (port.endsWith(":80")) {
-								try {
-									Integer kerberosPort = Integer.decode(Fonctions.getFieldFromString(port, ":", 0));
-									aCamera.setKerberosPort(kerberosPort);
-									Fonctions.trace("INF", "Kerberos port for Camera " + aCamera.getName() + " will be "
-											+ kerberosPort, "CORE");
-								} catch (Exception e) {
-									Fonctions.trace("WNG", "Error while parsing port line " + port + ", continue",
-											"CORE");
-								}
-
-							}
+			for (File aFile : new File(getKerberosioPath()).listFiles()) {
+				if (aFile.isDirectory()) {
+					Fonctions.trace("DBG", "Found a camera " + aFile.getName(), "CORE");
+					Camera aCamera = new Camera();
+					aCamera.setName(aFile.getName());
+					if (Core.getInstance().getUsers().get("admin").getCameras().containsKey(aCamera.getName())) {
+						aCamera = Core.getInstance().getUsers().get("admin").getCameras().get(aCamera.getName());
+						if (clean) {
+							aCamera.clean();
 						}
 					} else {
-						Fonctions.trace("WNG", "Can't find service with container_name:" + aCamera.getName()
-								+ " in docker-compose.yaml", "CORE");
+						aCamera.setDaysBeforePurge(Core.getInstance().getDaysBeforePurge());
+						Fonctions.trace("INF", "New Camera detected " + aCamera.getName() + " sending message to GUI",
+								"CORE");
+						Message aMessage = new Message();
+						aMessage.setAction("RELOAD");
+						aMessage.setMessage("New camera detected " + aCamera.getName());
+						AdminWebSocket.broadcastMessage(aMessage);
 					}
 
+					aCamera.setCapturePath(aFile.getAbsolutePath() + "/capture");
+					if (dockerCompose != null) {
+						// Looking for exposePort
+						Service aService = getServiceFromContainerName(aCamera.getName());
+						if (aService != null) {
+							for (String port : aService.getPorts()) {
+								if (port.endsWith(":8889")) {
+									try {
+										Integer broadCastPort = Integer
+												.decode(Fonctions.getFieldFromString(port, ":", 0));
+										aCamera.setBroadcastPort(broadCastPort);
+										Fonctions.trace("INF", "Broadcast port for Camera " + aCamera.getName()
+												+ " will be " + broadCastPort, "CORE");
+									} catch (Exception e) {
+										Fonctions.trace("WNG", "Error while parsing port line " + port + ", continue",
+												"CORE");
+									}
+								}
+								if (port.endsWith(":80")) {
+									try {
+										Integer kerberosPort = Integer
+												.decode(Fonctions.getFieldFromString(port, ":", 0));
+										aCamera.setKerberosPort(kerberosPort);
+										Fonctions.trace("INF", "Kerberos port for Camera " + aCamera.getName()
+												+ " will be " + kerberosPort, "CORE");
+									} catch (Exception e) {
+										Fonctions.trace("WNG", "Error while parsing port line " + port + ", continue",
+												"CORE");
+									}
+
+								}
+							}
+						} else {
+							Fonctions.trace("WNG", "Can't find service with container_name:" + aCamera.getName()
+									+ " in docker-compose.yaml", "CORE");
+						}
+
+					}
+					aCamera.populate();
+					Core.getInstance().getUsers().get("admin").getCameras().put(aCamera.getName(), aCamera);
 				}
-				aCamera.populate();
-				Core.getInstance().getUsers().get("admin").getCameras().put(aCamera.getName(), aCamera);
 			}
+			TimeLine aTimeLine = new TimeLine();
+			aTimeLine.populate();
+			Core.getInstance().setTimeline(aTimeLine);
 		}
-		TimeLine aTimeLine = new TimeLine();
-		aTimeLine.populate();
-		Core.getInstance().setTimeline(aTimeLine);
 	}
 
 	private Service getServiceFromContainerName(String containerName) {
