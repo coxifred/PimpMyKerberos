@@ -5,14 +5,17 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
 # Table of Contents
   * [Under the hood](#chapter-1)
   * [Requirements](#chapter-2)
-  * [Installations](#chapter-3)
-  * [Configuration](#chapter-4)
+  * [Installation dockerMode](#chapter-3)
+  * [Installation hostMode with compilation](#chapter-4)
+  * [Configuration](#chapter-5)
 
 ## Under the hood <a name="chapter-1"></a>
 
 **pimpMyKerberos** is a small footprint java (jetty) server which unify all your cameras in one single interface. As [Kerberos.io](https://kerberos.io), it displays your captures with chronology, but this time will all cameras time-synchronized (Interesting if you want to correlate some events on multiple locations). **pimpMyKerberos** scans capture's directories and sort files by time. Also works with every CCTV system which dump pictures or mp4 captures. **pimpMyKerberos** provides an https access broadcasting your local network cameras.
 
 <p align="center"><img src=https://github.com/coxifred/pimpMyKerberos/blob/master/resources/infra.jpg?raw=true /></p>
+
+<p align="center"><img src=https://github.com/coxifred/pimpMyKerberos/blob/master/resources/arch.jpg?raw=true /></p>
 
 What **pimpMyKerberos** doesn't do:
   
@@ -25,7 +28,7 @@ What **pimpMyKerberos** doesn't do:
 - [x] Kerberos.io (docker mode with docker-compose)
 - [x] Directory structure
 
-## Installations <a name="chapter-3"></a>
+## Installation dockerMode <a name="chapter-3"></a>
   
  Before install, check that you will respect the following tree structure (volumes provided to kerberos.io container). If you don't have yet configure your docker, download this [docker-compose.yml](https://github.com/coxifred/pimpMyKerberos/blob/master/resources/docker-compose.yml).
   
@@ -47,13 +50,9 @@ What **pimpMyKerberos** doesn't do:
       - /kerberos/<your_cam2>/webconfig:/var/www/web/config
   ```
   
-  * 2 install modes (Choose one):
-  
-  1. As docker container (fastest)
-  
-  2. As java server over docker (running on the host)
-  
-  Extra requirements:
+## Installation hostMode with compilation <a name="chapter-4"></a>
+
+ Extra requirements:
   
   - [x] Java JDK version >= 1.8 (**yum install java-1.8.0-openjdk-devel**)
   - [x] Git client (**yum install git**)
@@ -76,7 +75,7 @@ What **pimpMyKerberos** doesn't do:
   # Jar is generated under build/libs with name PimpMyKerberos.jar
   ```
 
-## Configuration <a name="chapter-4"></a>
+## Configuration <a name="chapter-5"></a>
 
   1. As docker container
 
