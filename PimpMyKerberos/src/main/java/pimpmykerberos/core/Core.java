@@ -465,6 +465,7 @@ public class Core {
 		}
 
 		// Explore cameras
+		Fonctions.trace("WNG", "Explore cameras under " + getKerberosioPath(), "CORE");
 		for (File aFile : new File(getKerberosioPath()).listFiles()) {
 			if (aFile.isDirectory()) {
 				Fonctions.trace("DBG", "Found a camera " + aFile.getName(), "CORE");
