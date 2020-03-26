@@ -8,6 +8,7 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
   * [Installation dockerMode](#chapter-3)
   * [Installation hostMode with compilation](#chapter-4)
   * [Configuration](#chapter-5)
+  * [Update](#chapter-6)
 
 ## Under the hood <a name="chapter-1"></a>
 
@@ -81,4 +82,9 @@ What **pimpMyKerberos** doesn't do:
 
   2. For java server over docker (running on the host)
   
-  
+## Update <a name="chapter-6"></a>  
+
+```bash
+git pull
+./setup.sh
+```

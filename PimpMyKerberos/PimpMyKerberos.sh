@@ -3,17 +3,21 @@
 
 fct_start()
 {
+ MAX=10
  echo "Logs will be dumped into ./logs under $(pwd)"
  mkdir logs 2>/dev/null
  nohup java -jar build/libs/PimpMyKerberos.jar ./configFile/aCore.xml > ./logs/pimpMyKerberos.log 2>&1 &
  i=0
- while [ "$i" -lt 10 ]
+ while [ "$i" -lt $MAX ]
   do
-   echo ".\c"
+   echo "${i}/${MAX}"
    sleep 1
    i=$(expr $i + 1)
   done
   tail -200 ./logs/pimpMyKerberos.log
+  echo " "
+  echo " You should see an http:// url in log"
+  echo "."
 }
 
 fct_stop()
