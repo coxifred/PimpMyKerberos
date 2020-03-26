@@ -25,8 +25,9 @@ What **pimpMyKerberos** doesn't do:
 
 - [x] Cameras :)
 - [x] Linux distribution
-- [x] Kerberos.io (docker mode with docker-compose)
-- [x] Directory structure
+- [x] Kerberos.io (docker mode with docker-compose) **yum install docker ; curl -L "https://github.com/docker/compose/releases/download/latest/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose ; chmod a+x /usr/local/bin/docker-compose**
+)
+- [x] Git client (**yum install git**)
 
 ## Installation dockerMode <a name="chapter-3"></a>
   
@@ -52,11 +53,10 @@ What **pimpMyKerberos** doesn't do:
   
 ## Installation hostMode with compilation <a name="chapter-4"></a>
 
- Extra requirements:
+ Extra requirement:
   
   - [x] Java JDK version >= 1.8 (**yum install java-1.8.0-openjdk-devel**)
-  - [x] Git client (**yum install git**)
-  
+ 
   Download project
   ```bash
   git clone https://github.com/coxifred/pimpMyKerberos.git
