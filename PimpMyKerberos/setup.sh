@@ -55,6 +55,7 @@ fct_createTree()
    fi
   else
    fct_echo INF "Building directory"
+   rm -rf /kerberos 2>/dev/null
    fct_command cp -Rp kerberos /kerberos
 fi
 }
@@ -83,7 +84,7 @@ fct_command test -f configFile/aCore.xml
 clear
 if [ -d /kerberos ]
  then
-  fct_echo INF "/kerberos already exist, reinit ? [y/N]:" ; read INIT
+  fct_echo INF "/kerberos already exist, reinit (all datas will be deleted) ? [y/N]:" ; read INIT
   if [ "${INIT}" = "y" -o "${INIT}" = "Y" ]
    then
     fct_createTree FORCE
@@ -92,11 +93,11 @@ if [ -d /kerberos ]
   fct_createTree
 fi
 
-fct_echo INF "PimpMyKerberos will start by executing ./PimpMyKerberos.sh start"
+fct_echo INF "PimpMyKerberos will start by executing ./PimpMyKerberos.sh restart"
 fct_echo INF "For next time : "
 fct_echo INF " For starting ./PimpMyKerberos.sh start"
 fct_echo INF " For stopping ./PimpMyKerberos.sh stop"
 fct_echo INF " For restart  ./PimpMyKerberos.sh restart"
 echo " "
 fct_echo INF "Press enter to continue" ; read SUITE
-./PimpMyKerberos.sh start
+./PimpMyKerberos.sh restart
