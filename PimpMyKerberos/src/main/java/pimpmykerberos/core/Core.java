@@ -201,17 +201,18 @@ public class Core {
 				Fonctions.trace("INF", "Watching under physical interface " + netint.getDisplayName(), "CORE");
 				if (!netint.getDisplayName().contains("docker")) {
 					Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-					for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-						Fonctions.trace("INF", "IP available " + inetAddress, "CORE");
-						if (!("/127.0.0.1").equals(inetAddress.toString())
-								&& !("/0:0:0:0:0:0:0:1").equals(inetAddress.toString())
-								&& !inetAddress.toString().contains(":")) {
-							Fonctions.trace("INF", "Found interesting ip " + inetAddress, "CORE");
-							ws.setIp(inetAddress.getLocalHost().getHostAddress());
+					for (InetAddress anAddress : Collections.list(inetAddresses)) {
+						Fonctions.trace("INF", "IP available " + anAddress, "CORE");
+						if (!("/127.0.0.1").equals(anAddress.toString())
+								&& !("/0:0:0:0:0:0:0:1").equals(anAddress.toString())
+								&& !anAddress.toString().contains(":")) {
+							Fonctions.trace("INF", "Found interesting ip " + anAddress, "CORE");
+							ws.setIp(anAddress.toString().replaceAll("/", ""));
+							Fonctions.trace("INF", "Webserver ip " + ws.getIp(), "CORE");
 							found = true;
 							break;
 						} else {
-							Fonctions.trace("WNG", "Ip not interesting " + inetAddress, "CORE");
+							Fonctions.trace("WNG", "Ip not interesting " + anAddress, "CORE");
 						}
 
 					}
