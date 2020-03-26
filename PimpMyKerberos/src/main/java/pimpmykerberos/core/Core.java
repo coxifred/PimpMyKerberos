@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,7 +194,35 @@ public class Core {
 		Fonctions.trace("INF", "Starting webserver on port " + getWebServerPort(), "CORE");
 		ws = new Webserver();
 		if (getWebServerIp() == null) {
-			ws.setIp(InetAddress.getLocalHost().getHostAddress());
+			 Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+			 Fonctions.trace("INF", "Looking network interface <> 127.0.0.1 (can be tuned by adding this line <webServerIp>your_ip</webServerIp> in aCore.xml", "CORE");
+			 Boolean found=false;
+		        for (NetworkInterface netint : Collections.list(nets))
+		        {
+		        	Fonctions.trace("INF", "Watching under physical interface " + netint.getDisplayName(), "CORE");
+		        	Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+		            for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+		            	Fonctions.trace("INF", "IP available " + inetAddress, "CORE");
+		            	if ( ! ("/127.0.0.1").equals(inetAddress.toString()) && ! ("/0:0:0:0:0:0:0:1").equals(inetAddress.toString()) && ! inetAddress.toString().contains(":") )
+		            	{
+		            		Fonctions.trace("INF", "Found interesting ip " + inetAddress, "CORE");
+		            		ws.setIp(inetAddress.getLocalHost().getHostAddress());
+		            		found=true;
+		            		break;
+		            	}else
+		            	{
+		            		Fonctions.trace("WNG", "Ip not interesting " + inetAddress, "CORE");
+		            	}
+		                
+		            }
+		            if ( found )
+		            {
+		             break;
+		            }
+		        }
+			
+			
+			
 		} else {
 			ws.setIp(getWebServerIp());
 		}

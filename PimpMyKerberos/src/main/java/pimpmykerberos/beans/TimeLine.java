@@ -15,25 +15,29 @@ import pimpmykerberos.utils.Fonctions;
 
 public class TimeLine {
 	transient TreeMap<Long, Map<Integer, Media>> timeToMedia = new TreeMap<Long, Map<Integer, Media>>();
-	
 
 	public void populate() {
-		
-		TreeMap<Long, Map<Integer, Media>> cameraToMediaTemp = new TreeMap<Long, Map<Integer, Media>>(Collections.reverseOrder());
+
+		TreeMap<Long, Map<Integer, Media>> cameraToMediaTemp = new TreeMap<Long, Map<Integer, Media>>(
+				Collections.reverseOrder());
 		// Retrieve all time entries
 		User admin = Core.getInstance().getUsers().get("admin");
 		int cameraNumber = 1;
 		for (Camera aCamera : admin.getCameras().values()) {
 			for (Long aTime : aCamera.getTimeToFile().keySet()) {
 				Map<Integer, Media> mediaz = new HashMap<Integer, Media>();
+				// Check if file are still presents;
+				cleanMissings(cameraToMediaTemp, aTime);
 				if (cameraToMediaTemp.containsKey(aTime)) {
 					mediaz = cameraToMediaTemp.get(aTime);
+
 				}
-				mediaz.put(cameraNumber, new Media(aCamera.getTimeToFile().get(aTime),aTime,aCamera.getName()));
+				mediaz.put(cameraNumber, new Media(aCamera.getTimeToFile().get(aTime), aTime, aCamera.getName()));
 				cameraToMediaTemp.put(aTime, mediaz);
 			}
 			cameraNumber++;
 		}
+		timeToMedia.clear();
 		timeToMedia = cameraToMediaTemp;
 		Fonctions.trace("DBG", timeToMedia.size() + " total entries", "TimeLine");
 	}
@@ -44,17 +48,14 @@ public class TimeLine {
 		aCrunch.setMaxLineDisplay(Core.getInstance().getMaxDisplayLineInGUI());
 		aCrunch.setMaxColumnDisplay(Core.getInstance().getMaxDisplayColumnInGUI());
 		if (timeToMedia.size() > 0) {
-			if ( timeToMedia.size() < Core.getInstance().getMaxDisplayLineInGUI())
-			{
+			if (timeToMedia.size() < Core.getInstance().getMaxDisplayLineInGUI()) {
 				aCrunch.setMaxLineDisplay(timeToMedia.size());
 			}
-			if (startCrunch == null)
-			{
+			if (startCrunch == null) {
 				startCrunch = timeToMedia.firstKey().toString();
 			}
-			if ( size == null ) 
-			{
-				size=Core.getInstance().getMaxDisplayLineInGUI().toString();
+			if (size == null) {
+				size = Core.getInstance().getMaxDisplayLineInGUI().toString();
 			}
 
 			Long sCrunchLong = Long.decode(startCrunch);
@@ -65,32 +66,15 @@ public class TimeLine {
 
 			long currentSize = 0;
 			for (Long aLong : timeToMedia.keySet()) {
-				
+
 				if (aLong <= sCrunchLong && currentSize < aSize) {
 					Fonctions.trace("DBG", "aLong=" + aLong + " => " + new Date(aLong), "TimeLine");
-					if (currentSize == 0)
-					{
+					if (currentSize == 0) {
 						aCrunch.setStartCrunch(aLong);
 					}
 					// Check if file still exists
-					Map<Integer,Media> check=timeToMedia.get(aLong);
-					List<Integer> toClean=new ArrayList<Integer>();
-					for ( Integer aMediaInt:check.keySet())
-					{
-						Media aMedia=check.get(aMediaInt);
-						File aMediaToCheck=new File(aMedia.pathToMedia);
-						if ( ! aMediaToCheck.exists())
-						{
-							Fonctions.trace("ERR", "File " + aMedia.pathToMedia + " is no more present, clean from memory", "TimeLine");
-							toClean.add(aMediaInt);
-						}
-					}
-					
-					for ( Integer aIntToDelete:toClean)
-					{
-						check.remove(aIntToDelete);
-					}
-					
+					cleanMissings(timeToMedia, aLong);
+
 					cameraToMedia.add(timeToMedia.get(aLong));
 					aCrunch.setEndCrunch(aLong);
 					currentSize++;
@@ -101,6 +85,26 @@ public class TimeLine {
 		return aCrunch;
 	}
 
+	private void cleanMissings(TreeMap<Long, Map<Integer, Media>> checkMap, Long aLong) {
+		Map<Integer, Media> check = checkMap.get(aLong);
+		List<Integer> toClean = new ArrayList<Integer>();
+		if (check != null) {
+			for (Integer aMediaInt : check.keySet()) {
+				Media aMedia = check.get(aMediaInt);
+				File aMediaToCheck = new File(aMedia.pathToMedia);
+				if (!aMediaToCheck.exists()) {
+					Fonctions.trace("ERR", "File " + aMedia.pathToMedia + " is no more present, clean from memory",
+							"TimeLine");
+					toClean.add(aMediaInt);
+				}
+			}
+
+			for (Integer aIntToDelete : toClean) {
+				check.remove(aIntToDelete);
+			}
+		}
+	}
+
 	public TreeMap<Long, Map<Integer, Media>> getTimeToMedia() {
 		return timeToMedia;
 	}
@@ -109,6 +113,4 @@ public class TimeLine {
 		this.timeToMedia = timeToMedia;
 	}
 
-
-	
 }
