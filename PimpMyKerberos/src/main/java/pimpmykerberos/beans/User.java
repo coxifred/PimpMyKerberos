@@ -42,13 +42,14 @@ public class User {
 
 	public void saveUser() {
 		XStream aStream = new XStream();
+		File aFile = new File(System.getProperty("dataPath", Core.getInstance().getDataPath()));
 		try {
-			File aFile = new File(System.getProperty("dataPath", Core.getInstance().getDataPath()));
 			Fonctions.trace("DBG",
 					"Saving file to " + aFile.getAbsolutePath() + "/pimpMyKerberos_user_" + name + ".xml", "CORE");
 			aStream.toXML(this, new FileWriter(aFile.getAbsolutePath() + "/pimpMyKerberos_user_" + name + ".xml"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			Fonctions.trace("ERR",
+					"Erro while saving file to " + aFile.getAbsolutePath() + "/pimpMyKerberos_user_" + name + ".xml", "CORE");
 		}
 	}
 
