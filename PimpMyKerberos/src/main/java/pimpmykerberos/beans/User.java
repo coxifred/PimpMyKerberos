@@ -47,7 +47,7 @@ public class User {
 			Fonctions.trace("DBG",
 					"Saving file to " + aFile.getAbsolutePath() + "/pimpMyKerberos_user_" + name + ".xml", "CORE");
 			aStream.toXML(this, new FileWriter(aFile.getAbsolutePath() + "/pimpMyKerberos_user_" + name + ".xml"));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Fonctions.trace("ERR",
 					"Erro while saving file to " + aFile.getAbsolutePath() + "/pimpMyKerberos_user_" + name + ".xml", "CORE");
 		}
