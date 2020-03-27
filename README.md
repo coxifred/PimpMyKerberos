@@ -31,7 +31,7 @@ What **pimpMyKerberos** doesn't do:
 
 ## Installation dockerMode <a name="chapter-3"></a>
   
- Full installation (automatic pull for kerberos.io)
+ Full installation (automatic pull for kerberos.io). You will receive, kerberos.io docker containers and 1 pimpMyKerberos docker container
   
   ```bash
   git clone https://github.com/coxifred/pimpMyKerberos.git
@@ -40,6 +40,8 @@ What **pimpMyKerberos** doesn't do:
   ```
   
 ## Installation hostMode with compilation <a name="chapter-4"></a>
+
+ You will receive, kerberos.io docker containers but pimpMyKerberos will run on the host (not in a docker container)
 
  Extra requirement:
   
