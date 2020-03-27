@@ -2,6 +2,7 @@
   <coreFile>./configFile/aCore.xml</coreFile>
   <webServerPort>443</webServerPort>
   <webSocketPort>4430</webSocketPort>
+  <webServerIp>0.0.0.0</webServerIp>
   <debug>true</debug>
   <timeBetweenScan>60000</timeBetweenScan>
   <debugJetty>false</debugJetty>
@@ -54,14 +55,6 @@
               <daysBeforePurge>30</daysBeforePurge>
               <broadcastPort>8891</broadcastPort>
               <freshDate>2020-03-26 20:58:29.0 UTC</freshDate>
-            </pimpmykerberos.beans.Camera>
-          </entry>
-          <entry>
-            <string>kerberos</string>
-            <pimpmykerberos.beans.Camera>
-              <name>kerberos</name>
-              <capturePath>/kerberos/kerberos/capture</capturePath>
-              <daysBeforePurge>30</daysBeforePurge>
             </pimpmykerberos.beans.Camera>
           </entry>
           <entry>
