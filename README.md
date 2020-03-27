@@ -26,8 +26,7 @@ What **pimpMyKerberos** doesn't do:
 
 - [x] Cameras :)
 - [x] Linux distribution
-- [x] Kerberos.io (docker mode with docker-compose) **yum install docker ; curl -L "https://github.com/docker/compose/releases/download/latest/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose ; chmod a+x /usr/local/bin/docker-compose**
-)
+- [x] Kerberos.io (docker mode with docker-compose) **yum install docker ; curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose**
 - [x] Git client (**yum install git**)
 
 ## Installation dockerMode <a name="chapter-3"></a>
