@@ -31,24 +31,12 @@ What **pimpMyKerberos** doesn't do:
 
 ## Installation dockerMode <a name="chapter-3"></a>
   
- Before install, check that you will respect the following tree structure (volumes provided to kerberos.io container). If you don't have yet configure your docker, download this [docker-compose.yml](https://github.com/coxifred/pimpMyKerberos/blob/master/resources/docker-compose.yml).
+ Full installation (automatic pull for kerberos.io)
   
   ```bash
-      "camera1":
-      ...
-      volumes:
-      - /kerberos/<your_cam1>/capture:/etc/opt/kerberosio/capture
-      - /kerberos/<your_cam1>/config:/etc/opt/kerberosio/config
-      - /kerberos/<your_cam1>/logs:/etc/opt/kerberosio/logs
-      - /kerberos/<your_cam1>/webconfig:/var/www/web/config
-      
-      "camera2":
-      ...
-      volumes:
-      - /kerberos/<your_cam2>/capture:/etc/opt/kerberosio/capture
-      - /kerberos/<your_cam2>/config:/etc/opt/kerberosio/config
-      - /kerberos/<your_cam2>/logs:/etc/opt/kerberosio/logs
-      - /kerberos/<your_cam2>/webconfig:/var/www/web/config
+  git clone https://github.com/coxifred/pimpMyKerberos.git
+  cd pimpMyKerberos/PimpMyKerberos
+  ./setup.sh docker
   ```
   
 ## Installation hostMode with compilation <a name="chapter-4"></a>
@@ -61,28 +49,21 @@ What **pimpMyKerberos** doesn't do:
   ```bash
   git clone https://github.com/coxifred/pimpMyKerberos.git
   cd pimpMyKerberos/PimpMyKerberos
+  ./setup.sh half-docker
   ```
-  Check java version
-  ```bash
-  [root@localhost PimpMyKerberos]# java -version
-  openjdk version "1.8.0_242"
-  OpenJDK Runtime Environment (build 1.8.0_242-b08)
-  OpenJDK 64-Bit Server VM (build 25.242-b08, mixed mode)
-  ```
-  Build project
-  ```bash
-  chmod a+x ./gradlew ; ./gradlew fatJar
-  # Jar is generated under build/libs with name PimpMyKerberos.jar
-  ```
-
+  
 ## Configuration <a name="chapter-5"></a>
 
-  1. As docker container
+  Login prompt, user -> admin, password -> admin
 
-  2. For java server over docker (running on the host)
+  If you're in docker mode, configuration file should be in /kerberos/pimpMyKerberos/aCore.xml
+  
+  If you're in docker mode, configuration file should be in configFile/aCore.xml (under the place you git project)
   
 ## Update <a name="chapter-6"></a>  
 
+ for half-docker mode :
+ 
 ```bash
 git pull
 ./setup.sh
