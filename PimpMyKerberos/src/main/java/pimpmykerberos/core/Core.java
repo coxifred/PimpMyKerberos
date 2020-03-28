@@ -32,6 +32,7 @@ import pimpmykerberos.beans.docker.Service;
 import pimpmykerberos.server.Webserver;
 import pimpmykerberos.server.messages.Message;
 import pimpmykerberos.server.websocket.AdminWebSocket;
+import pimpmykerberos.threads.ThreadInflux;
 import pimpmykerberos.threads.ThreadMemory;
 import pimpmykerberos.threads.ThreadSaver;
 import pimpmykerberos.threads.ThreadWatch;
@@ -167,6 +168,16 @@ public class Core {
 	 * Datapath
 	 */
 	String dataPath = "";
+	
+	/**
+	 * InfluxDb url
+	 * 
+	 */
+	String influxDbUrl="";
+	String influxDbName="pimpMyKerberos";
+	String influxDbUser="root";
+	String influxDbPasswd="root";
+	
 
 	public void launch() throws Exception {
 
@@ -251,6 +262,10 @@ public class Core {
 		ThreadWatch tsw = new ThreadWatch();
 		tsw.start();
 
+		// Starting ThreadInfluxDb
+		ThreadInflux tin=new ThreadInflux();
+		tin.start();
+		
 		while (ws.getWebSocketThread().isAlive()) {
 			Fonctions.attendre(5000);
 
@@ -265,6 +280,10 @@ public class Core {
 			if (!tsw.isAlive()) {
 				tsw = new ThreadWatch();
 				tsw.start();
+			}
+			if (!tin.isAlive()) {
+				tin = new ThreadInflux();
+				tin.start();
 			}
 		}
 
@@ -651,6 +670,38 @@ public class Core {
 
 	public void setPaypal(String paypal) {
 		this.paypal = paypal;
+	}
+
+	public String getInfluxDbUrl() {
+		return influxDbUrl;
+	}
+
+	public void setInfluxDbUrl(String influxDbUrl) {
+		this.influxDbUrl = influxDbUrl;
+	}
+
+	public String getInfluxDbName() {
+		return influxDbName;
+	}
+
+	public void setInfluxDbName(String influxDbName) {
+		this.influxDbName = influxDbName;
+	}
+
+	public String getInfluxDbUser() {
+		return influxDbUser;
+	}
+
+	public void setInfluxDbUser(String influxDbUser) {
+		this.influxDbUser = influxDbUser;
+	}
+
+	public String getInfluxDbPasswd() {
+		return influxDbPasswd;
+	}
+
+	public void setInfluxDbPasswd(String influxDbPasswd) {
+		this.influxDbPasswd = influxDbPasswd;
 	}
 
 }
