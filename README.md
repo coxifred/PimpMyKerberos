@@ -88,7 +88,7 @@ What **pimpMyKerberos** doesn't do:
   Download project
   ```bash
   git clone https://github.com/coxifred/pimpMyKerberos.git
-  gradlew fatjar
+  ./gradlew fatjar
   ```
   
 ## Configuration <a name="chapter-8"></a>
