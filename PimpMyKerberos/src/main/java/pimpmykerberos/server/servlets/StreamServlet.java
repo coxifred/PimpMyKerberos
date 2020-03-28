@@ -83,7 +83,7 @@ public class StreamServlet extends HttpServlet {
 			AdminWebSocket.broadcastMessage(aMessage);
 			Fonctions.trace("ERR", "Couldn't stream to " + url + " generally because ip is different from kerberos.io ip, if pimpMyKerberos is on same server, you can force ip to aCore.xml <webServerIp>same_as_kerberos.io</webServerIp>, or either set <ip>kerberos.io ip</ip> under each camera in aCore.xml", "StreamServlet");
 				try {
-				InputStream fin = ClassLoader.class.getResourceAsStream("/webInterface/images/wolf.png");
+				InputStream fin = StreamServlet.class.getResourceAsStream("/webInterface/images/wolf.png");
 				out = response.getOutputStream();
 				int ch = 0;
 				;
