@@ -492,7 +492,7 @@ public class Core {
 		} else {
 
 			for (File aFile : new File(getKerberosioPath()).listFiles()) {
-				if (aFile.isDirectory()) {
+				if (aFile.isDirectory() && ! aFile.getName().equals("pimpMyKerberos")) {
 					Fonctions.trace("DBG", "Found a camera " + aFile.getName(), "CORE");
 					Camera aCamera = new Camera();
 					aCamera.setName(aFile.getName());
