@@ -658,7 +658,7 @@ public class Core {
 		return muteMode;
 	}
 
-	String paypal = "https://paypal.me/FredericCOSTANT/2";
+	transient String paypal = "https://paypal.me/FredericCOSTANT/2";
 
 	public void setMuteMode(Integer muteMode) {
 		this.muteMode = muteMode;
