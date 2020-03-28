@@ -1,5 +1,15 @@
 version: "2"
 services:
+  "pimpmykerberos":
+    image: "pimpmykerberos/pimpmykerberos"
+    container_name: "pimpmykerberos"
+    restart: always
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /kerberos:/kerberos:Z
+
   "camera1_name":
     image: "kerberos/kerberos"
     container_name: "camera1_name"
