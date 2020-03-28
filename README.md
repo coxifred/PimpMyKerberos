@@ -9,8 +9,10 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
   * [Installation dockerMode](#chapter-4)
   * [Installation hostMode with gradle compilation](#chapter-5)
   * [Installation binary mode without docker](#chapter-6)
-  * [Configuration](#chapter-5)
-  * [Update](#chapter-6)
+  * [Installation in compilation mode without docker](#chapter-7)
+  * [Configuration](#chapter-8)
+  * [Update](#chapter-9)
+  * [Next features](#chapter-10)
   
   
 ## Screenshots <a name="chapter-1"></a>  
@@ -89,7 +91,7 @@ What **pimpMyKerberos** doesn't do:
   gradlew fatjar
   ```
   
-## Configuration <a name="chapter-5"></a>
+## Configuration <a name="chapter-8"></a>
 
   Login prompt, user -> admin, password -> admin
 
@@ -122,7 +124,7 @@ What **pimpMyKerberos** doesn't do:
 </pimpmykerberos.core.Core>
 ```
   
-## Update <a name="chapter-6"></a>  
+## Update <a name="chapter-9"></a>  
 
 ```bash
 git pull
@@ -130,3 +132,7 @@ git pull
 then relaunch the appropriate installation mode.
 
 <p align="center"><img src="https://github.com/coxifred/pimpMyKerberos/blob/master/resources/pimpMyKerberos.jpg?raw=true" height=300 ></p>
+
+## Next features <a name="chapter-10"></a>  
+
+Mobile responsive.
