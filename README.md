@@ -3,14 +3,19 @@
 _Timing Correlation between VideoCam (based on Kerberos.io)_
 
 # Table of Contents
-  * [Under the hood](#chapter-1)
-  * [Requirements](#chapter-2)
-  * [Installation dockerMode](#chapter-3)
-  * [Installation hostMode with compilation](#chapter-4)
+  * [Screenshots](#chapter-1)
+  * [Under the hood](#chapter-2)
+  * [Requirements](#chapter-3)
+  * [Installation dockerMode](#chapter-4)
+  * [Installation hostMode with gradle compilation](#chapter-5)
+  * [Installation binary mode without docker](#chapter-6)
   * [Configuration](#chapter-5)
   * [Update](#chapter-6)
+  
+  
+## Screenshots <a name="chapter-1"></a>  
 
-## Under the hood <a name="chapter-1"></a>
+## Under the hood <a name="chapter-2"></a>
 
 **pimpMyKerberos** is a small footprint java (jetty) server which unify all your cameras in one single interface. As [Kerberos.io](https://kerberos.io), it displays your captures with chronology, but this time will all cameras time-synchronized (Interesting if you want to correlate some events on multiple locations). **pimpMyKerberos** scans capture's directories and sort files by time. Also works with every CCTV system which dump pictures or mp4 captures. **pimpMyKerberos** provides an https access broadcasting your local network cameras.
 
@@ -22,16 +27,16 @@ What **pimpMyKerberos** doesn't do:
   
    * It doesn't connect directly to your cameras, but only provides pictures/movies made by Kerberos.io
  
-## Requirements <a name="chapter-2"></a>
+## Requirements <a name="chapter-3"></a>
 
 - [x] Cameras :)
 - [x] Linux distribution
 - [x] Kerberos.io (docker mode with docker-compose) **yum install docker ; curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose ; chmod a+x /usr/local/bin/docker-compose**
 - [x] Git client (**yum install git**)
 
-## Installation dockerMode <a name="chapter-3"></a>
+## Installation in dockerMode <a name="chapter-4"></a>
   
- Full installation (automatic pull for kerberos.io). You will receive, kerberos.io docker containers and 1 pimpMyKerberos docker container
+ Full installation (automatic pull for kerberos.io). You will receive, kerberos.io docker containers and 1 pimpMyKerberos docker   container
   
   ```bash
   git clone https://github.com/coxifred/pimpMyKerberos.git
@@ -39,7 +44,13 @@ What **pimpMyKerberos** doesn't do:
   ./setup.sh docker
   ```
   
-## Installation hostMode with compilation <a name="chapter-4"></a>
+ For a pimpMyKerberos docker container:
+ 
+ ```bash
+ docker pull 
+ ```
+
+## Installation in hostMode with gradle compilation<a name="chapter-5"></a>
 
  You will receive, kerberos.io docker containers but pimpMyKerberos will run on the host (not in a docker container)
 
@@ -50,8 +61,32 @@ What **pimpMyKerberos** doesn't do:
   Download project
   ```bash
   git clone https://github.com/coxifred/pimpMyKerberos.git
+  
   cd pimpMyKerberos/PimpMyKerberos
   ./setup.sh half-docker
+  ```
+  
+## Installation in binary mode without docker<a name="chapter-6"></a>
+
+ Extra requirement:
+  
+  - [x] Java JDK version >= 1.8 (**yum install java-1.8.0-openjdk-devel or pkg install jdk-8**)
+ 
+  Download project
+  ```bash
+  git clone https://github.com/coxifred/pimpMyKerberos.git
+  
+  ```
+## Installation in compilation mode without docker<a name="chapter-7"></a>
+
+ Extra requirement:
+  
+  - [x] Java JDK version >= 1.8 (**yum install java-1.8.0-openjdk-devel or pkg install jdk-8**)
+ 
+  Download project
+  ```bash
+  git clone https://github.com/coxifred/pimpMyKerberos.git
+  gradlew fatjar
   ```
   
 ## Configuration <a name="chapter-5"></a>
@@ -64,9 +99,9 @@ What **pimpMyKerberos** doesn't do:
   
 ## Update <a name="chapter-6"></a>  
 
- for half-docker mode :
- 
 ```bash
 git pull
-./setup.sh
 ```
+then relaunch the appropriate installation mode.
+
+<p align="center"><img src="https://github.com/coxifred/pimpMyKerberos/blob/master/resources/pimpMyKerberos.jpg?raw=true" height=300 ></p>
