@@ -1,0 +1,5 @@
+docker build --tag pimpmykerberos:1.0 .
+docker login
+docker tag pimpmykerberos:1.0 docker.io/coxifred/pimpmykerberos:1.0
+docker push coxifred/pimpmykerberos:1.0
+

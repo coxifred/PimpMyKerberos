@@ -35,9 +35,17 @@ fct_start()
  fi
  docker-compose help >/dev/null 2>&1
  if [ "$?" = "0" ]
-  then
+  then 
    docker-compose -f /kerberos/docker-compose.yml up -d
+   echo " "
+   echo " "
+   echo " You can tail log by docker logs -f pimpmykerberos"
+   echo " Open https://<your_ip>" 
  fi
+ echo " "
+ echo " And remember default user/passwd is admin/admin"
+ echo " "
+
 
 
 }

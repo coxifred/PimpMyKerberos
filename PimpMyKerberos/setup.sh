@@ -59,6 +59,8 @@ fct_createTree()
   then
    fct_echo INF "Ok ready to launch, but i need to create this tree with 4 examples camera instances"
    echo "/kerberos                                 <----- Top directory"
+   echo " "
+   echo "         /pimpMyKerberos/aCore.xml        <----- Config file in case of full stack docker"
    echo "         /camera1_name                    <----- Camera name you can rename after"
    echo "                      /capture            <----- Capture volume for kerberos.io mapped in docker"
    echo "                      /config             <----- Config volume for kerberos.io mapped in docker"
@@ -85,14 +87,14 @@ fct_createTree()
    if [ -z "${REP}" -o "${REP}" = "y" -o "${REP}" = "Y" ]
     then
      fct_echo INF "Building directory"
-     fct_command cp -Rp kerberos /kerberos
+     fct_command cp -RLp kerberos /kerberos
     else
      fct_echo INF "Abort" ; exit 1
    fi
   else
    fct_echo INF "Building directory, cleaning /kerberos ... could be long"
    rm -rf /kerberos 2>/dev/null
-   fct_command cp -Rp kerberos /kerberos
+   fct_command cp -RLp kerberos /kerberos
 fi
 
 if [ "${MODE}" = "docker" ]
@@ -142,7 +144,10 @@ fct_docker()
  fct_command docker-compose help >/dev/null
 
  fct_echo INF "Creating /kerberos/pimpMyKerberos"
- fct_command mkdir /kerberos/pimpMyKerberos 2>/dev/null || test -d /kerberos/pimpMyKerberos
+ if [ ! -d /kerberos/pimpMyKerberos ]
+  then
+   fct_command mkdir /kerberos/pimpMyKerberos 2>/dev/null
+ fi
 
  fct_echo INF "Checking aCore.xml file"
  fct_command test -f configFile/aCore.xml
@@ -154,12 +159,12 @@ fct_docker()
  fct_command docker-compose -f /kerberos/docker-compose.yml up -d
 }
 
-
+clear
 fct_echo INF "Starting configuration of PimpMyKerberos"
 echo ""
 if [ -d /kerberos ]
  then
-  fct_echo ASK "/kerberos already exist, reinit ? (all datas will be deleted), answer N if you just want to update PimpMyKerberos [y/N]:" ; read INIT
+  fct_echo ASK "mountpoint or directory /kerberos already exist, reinit ? (all datas will be deleted), answer N if you just want to update PimpMyKerberos [y/N]:" ; read INIT
   if [ "${INIT}" = "y" -o "${INIT}" = "Y" ]
    then
     fct_createTree FORCE
@@ -171,11 +176,14 @@ fi
 case "${MODE}" in
   "docker")
           fct_docker
+          fct_command touch dockerMode
           ;;
   "half-docker")
+          rm dockerMode 2>/dev/null
           fct_halfdocker 
           ;;
 esac
+
 
 
 
@@ -186,5 +194,5 @@ fct_echo INF " For starting ./PimpMyKerberos.sh start"
 fct_echo INF " For stopping ./PimpMyKerberos.sh stop"
 fct_echo INF " For restart  ./PimpMyKerberos.sh restart"
 echo " "
-fct_echo INF "Press enter to continue" ; read SUITE
+fct_echo INF "Press enter to start PimpMyKerberos" ; read SUITE
 ./PimpMyKerberos.sh restart
