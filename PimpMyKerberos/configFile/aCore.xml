@@ -2,7 +2,6 @@
   <coreFile>./configFile/aCore.xml</coreFile>
   <webServerPort>443</webServerPort>
   <webSocketPort>4430</webSocketPort>
-  <webServerIp>0.0.0.0</webServerIp>
   <debug>true</debug>
   <timeBetweenScan>60000</timeBetweenScan>
   <debugJetty>false</debugJetty>
@@ -29,10 +28,10 @@
             <pimpmykerberos.beans.Camera>
               <name>camera1_name</name>
               <capturePath>/kerberos/camera1_name/capture</capturePath>
-              <kerberosPort>80</kerberosPort>
+              <kerberosPort>81</kerberosPort>
               <daysBeforePurge>30</daysBeforePurge>
               <broadcastPort>8889</broadcastPort>
-              <freshDate>2020-03-26 20:58:29.0 UTC</freshDate>
+              <freshDate>2020-03-28 17:27:56.0 UTC</freshDate>
             </pimpmykerberos.beans.Camera>
           </entry>
           <entry>
@@ -40,10 +39,10 @@
             <pimpmykerberos.beans.Camera>
               <name>camera4_name</name>
               <capturePath>/kerberos/camera4_name/capture</capturePath>
-              <kerberosPort>83</kerberosPort>
+              <kerberosPort>84</kerberosPort>
               <daysBeforePurge>30</daysBeforePurge>
               <broadcastPort>8892</broadcastPort>
-              <freshDate>2020-03-26 20:58:30.0 UTC</freshDate>
+              <freshDate>2020-03-28 17:27:59.0 UTC</freshDate>
             </pimpmykerberos.beans.Camera>
           </entry>
           <entry>
@@ -51,10 +50,10 @@
             <pimpmykerberos.beans.Camera>
               <name>camera3_name</name>
               <capturePath>/kerberos/camera3_name/capture</capturePath>
-              <kerberosPort>82</kerberosPort>
+              <kerberosPort>83</kerberosPort>
               <daysBeforePurge>30</daysBeforePurge>
               <broadcastPort>8891</broadcastPort>
-              <freshDate>2020-03-26 20:58:29.0 UTC</freshDate>
+              <freshDate>2020-03-28 17:27:28.0 UTC</freshDate>
             </pimpmykerberos.beans.Camera>
           </entry>
           <entry>
@@ -62,10 +61,10 @@
             <pimpmykerberos.beans.Camera>
               <name>camera2_name</name>
               <capturePath>/kerberos/camera2_name/capture</capturePath>
-              <kerberosPort>81</kerberosPort>
+              <kerberosPort>82</kerberosPort>
               <daysBeforePurge>30</daysBeforePurge>
               <broadcastPort>8890</broadcastPort>
-              <freshDate>2020-03-26 20:58:29.0 UTC</freshDate>
+              <freshDate>2020-03-28 17:27:59.0 UTC</freshDate>
             </pimpmykerberos.beans.Camera>
           </entry>
         </cameras>
@@ -73,5 +72,9 @@
     </entry>
   </users>
   <dataPath></dataPath>
+  <influxDbUrl></influxDbUrl>
+  <influxDbName>pimpMyKerberos</influxDbName>
+  <influxDbUser>root</influxDbUser>
+  <influxDbPasswd>root</influxDbPasswd>
   <paypal>https://paypal.me/FredericCOSTANT/2</paypal>
 </pimpmykerberos.core.Core>
