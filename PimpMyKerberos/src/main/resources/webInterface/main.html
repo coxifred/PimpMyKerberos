@@ -689,7 +689,7 @@
 							html+="<button id=\"" + camera.name + "\" class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i>Seek</button>";
 							html+="<button id=\"" + camera.name + "\" class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i>Purge Files</button>";
 							html+="<button class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Settings</a></button>";
-							html+="<br><a target=new href=/stream?url=http://" + ip +":" + camera.broadcastPort + " ><img alt=\"<img src=images/bab.png>\" id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?url=http://" + ip +":" + camera.broadcastPort+"/></a>"
+							html+="<br><a target=new href=/stream?url=http://" + ip +":" + camera.broadcastPort + " ><img alt=\"no stream available see logs\" id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?url=http://" + ip +":" + camera.broadcastPort+"/></a>"
 						html+="</td>";
 					}
 					$("#cameraHeader").html(html + "</tr></table>");
