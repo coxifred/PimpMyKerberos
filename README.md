@@ -104,6 +104,7 @@ What **pimpMyKerberos** doesn't do:
     <coreFile>./configFile/aCore.xml</coreFile>          <!-- Config file, for information only, read-only-->
     <webServerPort>443</webServerPort>                   <!-- Port for https-->
     <webSocketPort>4430</webSocketPort>                  <!-- Port for websocket, not used, read only-->
+    <webServerIp>0.0.0.0</webServerIp>                   <!-- Can be blank, ip for binding web server-->
     <debug>true</debug>                                  <!-- Debug mode true|false-->
     <timeBetweenScan>60000</timeBetweenScan>             <!-- Time (in ms) between 2 directory analysis -->
     <debugJetty>false</debugJetty>                       <!-- Debug mode for jetty true|false -->
