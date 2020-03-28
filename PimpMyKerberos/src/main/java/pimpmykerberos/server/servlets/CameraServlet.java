@@ -63,6 +63,9 @@ public class CameraServlet extends AbstractServlet {
 			case "getTimeLine":
 				getTimeLine(request, response);
 				break;
+			case "getFileByHour":
+				getFileByHour(request, response);
+				break;
 			case "seek":
 				seek(request, response);
 				break;
@@ -127,6 +130,22 @@ public class CameraServlet extends AbstractServlet {
 					 Fonctions.trace("ERR", "Couldn't seek camera " + idCam, "CameraServlet");
 				 }
 				}
+			}
+		}
+		
+	}
+	
+	private void getFileByHour(HttpServletRequest request, HttpServletResponse response) {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				 try{
+				  response.getWriter().write(toGson(Core.getInstance().getTimeline().extractByHour()));
+				 }catch (Exception e)
+				 {
+					 Fonctions.trace("ERR", "Couldn't extract files amout by hour ", "CameraServlet");
+				 }
+				
 			}
 		}
 		

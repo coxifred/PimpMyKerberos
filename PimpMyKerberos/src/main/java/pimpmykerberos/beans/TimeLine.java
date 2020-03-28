@@ -2,6 +2,7 @@ package pimpmykerberos.beans;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ public class TimeLine {
 					mediaz = cameraToMediaTemp.get(aTime);
 
 				}
-				mediaz.put(cameraNumber, new Media(aCamera.getTimeToFile().get(aTime), aTime, aCamera.getName()));
+				mediaz.put(cameraNumber, new Media(aCamera.getTimeToFile().get(aTime), aTime, aCamera.getName(),new Date(aTime)));
 				cameraToMediaTemp.put(aTime, mediaz);
 			}
 			cameraNumber++;
@@ -111,6 +112,47 @@ public class TimeLine {
 
 	public void setTimeToMedia(TreeMap<Long, Map<Integer, Media>> timeToMedia) {
 		this.timeToMedia = timeToMedia;
+	}
+
+	public FilesByHour extractByHour() {
+		FilesByHour aFilesByHour=new FilesByHour();
+		if ( new File(Core.getInstance().getKerberosioPath()).isDirectory())
+		{
+			for (File aFile : new File(Core.getInstance().getKerberosioPath()).listFiles()) {
+				if (aFile.isDirectory()) {
+					
+					TreeMap<Long,Integer> mapCam=new TreeMap<Long,Integer>();
+					Calendar aCalendar=Calendar.getInstance();
+					for ( File subFile:new File(aFile.getAbsolutePath()+File.separator + "capture").listFiles())
+					{
+						if ( subFile.isFile())
+						{
+							aCalendar.setTimeInMillis(subFile.lastModified());
+							aCalendar.set(Calendar.MINUTE, 0);
+							aCalendar.set(Calendar.SECOND, 0);
+							aCalendar.set(Calendar.MILLISECOND, 0);
+							Integer count=1;
+							if ( mapCam.containsKey(aCalendar.getTimeInMillis()))
+									{
+									  count+=mapCam.get(aCalendar.getTimeInMillis());
+									}
+							Fonctions.trace("DBG", "Adding file count " + count + " to timeslot " + aCalendar.getTime() + " fileName is " + subFile.getName() + " file time " + new Date(subFile.lastModified()), "TimeLine");
+							mapCam.put(aCalendar.getTimeInMillis(), count);
+							aCalendar=Calendar.getInstance();
+							aCalendar.add(Calendar.HOUR_OF_DAY, 1);
+							mapCam.put(aCalendar.getTimeInMillis(),0);
+						}
+						
+					}
+					aFilesByHour.getCamMap().put(aFile.getName(), mapCam);
+				}
+			}
+		}else
+		{
+			Fonctions.trace("ERR", "KerberosioPath directory " + Core.getInstance().getKerberosioPath() + " is no more present",
+					"TimeLine");
+		}
+		return aFilesByHour;
 	}
 
 }

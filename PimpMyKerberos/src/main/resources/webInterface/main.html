@@ -6,6 +6,7 @@
 	   <link rel="stylesheet" type="text/css" href="css/main.css"/>
 	   <link rel="stylesheet" type="text/css" href="css/calendar.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/Chart.css"/>
  	   
 
 	
@@ -17,12 +18,23 @@
 		var core;
 		var mute=0;
 		var timeLineId=1;
+		var chart="";
+		var canvas="";
+		var ctx="";
 		var lastScrollTop = 0;
 		
 		// Affichage peripheriques des videos, on chargera les x timeline au dessus et en dessous, les autres seront mises à src="" pour décharger la mémoire
 		var peripheralDisplay=3;
 
+			
+		var dynamicColors = function () {
+ 				   var r = Math.floor(Math.random() * 255);
+    			   var g = Math.floor(Math.random() * 255);
+    			   var b = Math.floor(Math.random() * 255);
+    			  return "rgb(" + r + "," + g + "," + b + ")";
+		}
 		const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour :'numeric', minute:'numeric',second: 'numeric' };
+		const colorChart = ["rgba(53,166,155,0.6)","rgba(255,62,128,0.6)","rgba(154,255,210,0.6)","rgba(255,191,0,0.6)","rgba(143,73,255,0.6)","rgba(75,255,255,0.6)","rgba(51,0,153,0.6)",dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors(),dynamicColors()];
 		
 		function display(id){
 				//console.log("Can display now " + id);
@@ -33,10 +45,12 @@
 		
 		$(document).ready(function() {
 		
+		
+			$("html, body").animate({ scrollTop: 0 }, "slow");
 			loadCore();
 			WebSocketClient.open(url("hello")); 
 			reloadMemory();reloadSpace();loadLiveCamera();setNightMode(nightMode);
-			loadStoreCamera(true);
+			loadStoreCamera(true,"");
 		
 			setInterval(reloadMemory, 10000);
 			setInterval(displayTime, 1000);
@@ -51,7 +65,7 @@
 																try {
 																	timeLineJson=JSON.parse(json);
 																	console.log("from picker " + timeLineJson);
-																	loadStoreCamera(true);	
+																	loadStoreCamera(true,"");	
 																	}
 																	catch (e)
 																	{
@@ -78,6 +92,7 @@
 			$('#nightCheck').checkbox().checkbox({
 					    onChecked: function() {
 							      				setNightMode(1);
+												
 												getValueFromUrl("admin?action=setNightMode&nightMode=1",true);
 											  },
 					    onUnchecked: function() {
@@ -121,9 +136,10 @@
 			
 			$("#reloadButton").click(function(e){
 				button=$(this);
+				$("html, body").animate({ scrollTop: 0 }, "slow");
 				button.addClass("loading");
 				timeLineJson="";
-				loadStoreCamera(true);	
+				loadStoreCamera(true,"");	
 				button.removeClass("loading");
 				$("#reloadMessage").transition('fade down')
 				setNightMode(nightMode);
@@ -137,9 +153,169 @@
 				$("#reloadMessage").transition('fade down');
 				$('#muteCheck').checkbox('set checked');
 				mute=1;
+				$("#menu").transition('fly left');
+				displayMenu=1;
+				$('#muteCheck').transition('flash');
+				$('#muteCheck').css('position','absolute');
+				$('#muteCheck').css('left','3px');
 				getValueFromUrl("admin?action=setMuteMode&muteMode=1",true);
 			});
 			
+			
+			function hoursEarlier(hours) {
+  				return moment().subtract(hours, 'h').toDate();
+			};
+		
+			
+			$("#hideChartModal").click(function (e){
+				$("#showChartModal").transition('slide down');
+			
+			});
+			
+			$("#showChart").click(function (e){
+				datasets=new Array();
+				ctx = document.getElementById('myChart').getContext('2d');
+				
+				
+				getValueFromUrl("camera?action=getFileByHour",true,function(json){
+													
+				try {
+					fileByHourJson=JSON.parse(json);
+					//console.log(fileByHourJson);
+					i=0;
+					for (let camName of  Object.keys(fileByHourJson.camMap)) {
+						  //console.log(camName); 
+						  camera=fileByHourJson.camMap[camName];
+						  //console.log(camera);
+						  datas=new Array();
+						  for (let aTime of  Object.keys(fileByHourJson.camMap[camName])) {
+							  
+							  //console.log("time:" + aTime.substr(0,10));
+							  aDate = new Date(parseInt(aTime.substr(0,10) * 1000));
+							  //console.log("aDate:" + aDate);
+							  //console.log("count:" + fileByHourJson.camMap[camName][aTime]);
+							  aMeasure={
+								 		x: aDate,
+										y:fileByHourJson.camMap[camName][aTime]
+										}
+							  datas.push(aMeasure);
+							}
+						 
+						   dataset=	{
+									label: camName,
+									data: datas,
+									lineTension: 0.25,
+								    fill: true,
+								    borderColor: colorChart[i],
+								    backgroundColor: colorChart[i],
+								    //pointBorderColor: 'orange',
+								    //pointBackgroundColor: 'rgba(255,150,0,0.5)',
+								    //borderDash: [5, 5],
+								    pointRadius: 5,
+								    pointHoverRadius: 10,
+								    pointHitRadius: 30,
+								    pointBorderWidth: 2,
+								    pointStyle: 'rectRounded'
+									} 
+						   datasets.push(dataset);
+						i++;
+						}
+					
+					
+					}
+				catch (e)
+				 	{
+					console.log(e);
+					}
+				});
+				var camData = {
+				datasets: datasets
+				};
+				
+				
+				
+				var chartOptions = {
+					
+									tooltips: {
+									           callbacks: {
+									               label: function(tooltipItem, chart) {
+														//console.log(tooltipItem);
+														aDate=camData.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
+														return tooltipItem.yLabel + ' file(s)';
+									                }
+									            }
+									        },
+					
+					
+								  legend: {
+								    display: true,
+								    position: 'top',
+								    labels: {
+								      boxWidth: 80,
+								      fontColor: 'grey'
+								    }
+								  },
+								  scales: {
+								    xAxes: [{
+								      type: "time",
+		 							  distribution: 'linear',
+								      time: {
+								        unit: 'hour',
+								        unitStepSize: 1,
+								        round: 'hour',
+								        tooltipFormat: "HH:mm",
+								        displayFormats: {
+								          hour: 'DD/MM HH:mm'
+								        }
+								      }
+								    }],
+								    yAxes: [{
+								      gridLines: {
+								        color: "grey",
+								        borderDash: [2, 5],
+								      },
+								      scaleLabel: {
+								        display: true,
+								        labelString: "Files recorded",
+								        fontColor: "grey"
+								      }
+								    }]
+								  }
+								};
+
+				//Compute Chart
+				console.log("Reset chart ? " + chart);
+				if ( chart != ""){
+					chart.datas=camData;
+					chart.update();
+					
+				}else
+				{
+				chart = new Chart(ctx, {
+						    type: 'line',
+							data: camData,
+							options: chartOptions
+						});
+				
+				canvas=document.getElementById('myChart');
+				canvas.onclick = function(evt) {
+				  var activePoint = chart.getElementAtEvent(event);
+				
+				  // make sure click was on an actual point
+				  if (activePoint.length > 0) {
+				    var clickedDatasetIndex = activePoint[0]._datasetIndex;
+				    var clickedElementindex = activePoint[0]._index;
+				    var value = chart.data.datasets[clickedDatasetIndex].data[clickedElementindex];    
+					timeLineJson=""; 
+					loadStoreCamera(true,"&startCrunch=" +Date.parse(value.x));
+				    //alert();
+				  }
+				}
+				}
+				
+				$('#showChartModal').transition('slide down')
+				toggleMenu();
+ 			});
 			
 			$("#cleanAll").click(function(e){
 				button=$(this);
@@ -148,7 +324,7 @@
 					button.removeClass("loading");	
 					timeLineJson="";
 					reloadSpace();
-					loadStoreCamera(true);	
+					loadStoreCamera(true,"");	
 					$('#purgeCounter').html(value + "  purged file(s).");
 					$('#purgeCount').modal('show');
 				});
@@ -162,7 +338,7 @@
 					button.removeClass("loading");
 					timeLineJson="";
 					reloadSpace();
-					loadStoreCamera(true);	
+					loadStoreCamera(true,"");	
 					$('#purgeCounter').html(value+ "  purged file(s).");
 					$('#purgeCount').modal('show');
 				});
@@ -176,7 +352,7 @@
 					try {
 						timeLineJson=JSON.parse(json);
 						console.log(timeLineJson);
-						loadStoreCamera(true);	
+						loadStoreCamera(true,"");	
 						}
 						catch (e)
 						{
@@ -192,35 +368,41 @@
 				$("#time").html(new Date().toLocaleDateString(undefined, options) );
 			}
 			
-			function setNightMode(nightMode)
+			function setNightMode(aNightMode)
 			{
-				nightMode=nightMode;
+				nightMode=aNightMode;
 				if ( nightMode == 1 )
 				 {
 					$('body').css("background-color","black");
 					$('#cameraHeader').css("background-color","black");
 					$('#fond').css("background-color","black");
 					$('#camContent').css("background-color","black");
-					$('#loadMore').css("background-color","black");
+					
 					$('#spaceBlock').css("background-color","black");
 					$('#spaceMemory').css("background-color","black");
 					$('#memoryColor').css("color","white");
 					$('#spaceColor').css("color","white");
 					$("body").find(".dateEvt").css("color","white");
+					$("body").find(".loadMore").css("background-color","black");
+					$("body").find(".loadMore").css("color","white");
 					$('#time').css("color","white");
+					$('#showChartModal').css("background-color","black");
 				}else
 				{					 
 				    $('body').css("background-color","white");
 					$('#cameraHeader').css("background-color","white");
 					$('#fond').css("background-color","white");
 					$('#camContent').css("background-color","white");
-					$('#loadMore').css("background-color","white");
+					
 					$('#spaceBlock').css("background-color","white");
 					$('#spaceMemory').css("background-color","white");
 					$('#memoryColor').css("color","black");
 					$('#spaceColor').css("color","black");
 					$("body").find(".dateEvt").css("color","black");
+					$("body").find(".loadMore").css("background-color","white");
+					$("body").find(".loadMore").css("color","black");
 					$('#time').css("color","black");
+					$('#showChartModal').css("background-color","white");
 				}
 			}
 			
@@ -301,7 +483,7 @@
 							
 								
 								console.log("Complete Reload and timeLineId " + timeLineId);
-								loadStoreCamera(false);
+								loadStoreCamera(false,"");
 								/*
 								var previous=timeLineId - 1;
 								$('.timeLine' + previous).each(function(num,val){
@@ -334,7 +516,10 @@
 						if ( i >= minElement && i <= maxElement)
 						{
 							$('.timeLine' + i).each(function(num,val){
-			   						 $(this).attr('src', $(this).attr('name'));
+								 	if ( $(this).attr('src') == "" )
+								     {
+			   						 	$(this).attr('src', $(this).attr('name'));
+									 }
 									 console.log("Load video for " + i);
 								});	
 						}else
@@ -350,10 +535,9 @@
 				
 				}
 			
-			
-				$("#menuDisplay").click(function(e)
-					{
-						if ( displayMenu == 0 )
+				function toggleMenu()
+				{
+					if ( displayMenu == 0 )
 						{
 							//$("#menu").show();
 							$("#menu").transition('fly left');
@@ -364,6 +548,11 @@
 								$("#menu").transition('slide down')
 								displayMenu=0;
 						}
+				}
+			
+				$("#menuDisplay").click(function(e)
+					{
+						toggleMenu();
 					});	
 		
 		
@@ -397,20 +586,25 @@
 			});
 	
 			
-		function loadStoreCamera(redraw)
+		function loadStoreCamera(redraw,crunch)
 		{
-			var crunch="";
-			if ( timeLineJson != "" )
+			
+			if ( timeLineJson != ""  )
 			{
-
 				if ( redraw )
 				 {
+					$("html, body").animate({ scrollTop: 0 }, "slow");
+					if ( crunch == "")
+					{
 					crunch="&startCrunch=" + (timeLineJson.startCrunch);
+					}
 				 }else
 				 {
-					crunch="&startCrunch=" + (timeLineJson.endCrunch);				
+					if ( crunch == "")
+					{
+					crunch="&startCrunch=" + (timeLineJson.endCrunch);
+					}				
 				 }
-	
 			}
 			
 			getValueFromUrl("camera?action=getTimeLine" + crunch,true,function(json){
@@ -435,16 +629,16 @@
 							{
 								html+="<td >";
 								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;width:335px><i style=z-index:200 class=\"waitingPimp notched circle loading icon\"></i></div>";
+								 aDate=new Date(timeLine[k].time);
+								 html += "<div class=dateEvt ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
 								 if ( timeLine[k].pathToMedia.endsWith(".mp4"))
 									{
-										 aDate=new Date(timeLine[k].time);
-									
-										 html += "<div class=dateEvt ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
+										 
 										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
 									}else if (timeLine[k].pathToMedia.endsWith(".jpg"))
 									{
-										 
-										 html += "<img class=forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=" + timeLine[k].pathToMedia + "\"/>";										
+										 console.log(timeLine[k].pathToMedia);
+										 html += "<img class=forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\" />";										
 									}
 								html+="</td>";
 								//console.log(timeLine[k]);
@@ -452,14 +646,15 @@
 						}						
 					html+="</tr>";
 					}
-					//if ( redraw) 
-					//{
-					//						$("#camContent").html(html + "</table><div id=loadMore class=\"ui segment loadMore\" style=width:100%;height:100px></div>");
-					//}else
-					//{
-											$("#camContent").append(html + "</table><div name=" + timeLineId + " id=timeLineId" + timeLineId + " class=\"ui segment loadMore\" style=width:100%;height:100px>" + timeLineId +"</div>");
+					if ( redraw) 
+					{
+														
+											$("#camContent").html(html + "</table><div name=" + timeLineId + " id=timeLineId" + timeLineId + " class=\"ui segment loadMore\" style=width:100%;height:100px>Load " + timeLineJson.maxLineDisplay +" timelines more</div>");
+					}else
+					{
+											$("#camContent").append(html + "</table><div name=" + timeLineId + " id=timeLineId" + timeLineId + " class=\"ui segment loadMore\" style=width:100%;height:100px>Load " + timeLineJson.maxLineDisplay +" timelines more</div>");
 											timeLineId++;						
-					//}
+					}
 
 					setNightMode(nightMode);
 				} catch (e)
@@ -494,7 +689,7 @@
 							html+="<button id=\"" + camera.name + "\" class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i>Seek</button>";
 							html+="<button id=\"" + camera.name + "\" class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i>Purge Files</button>";
 							html+="<button class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Settings</a></button>";
-							html+="<br><a target=new href=/stream?url=http://" + ip +":" + camera.broadcastPort + " ><img id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?url=http://" + ip +":" + camera.broadcastPort+"/></a>"
+							html+="<br><a target=new href=/stream?url=http://" + ip +":" + camera.broadcastPort + " ><img alt=\"<img src=images/bab.png>\" id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?url=http://" + ip +":" + camera.broadcastPort+"/></a>"
 						html+="</td>";
 					}
 					$("#cameraHeader").html(html + "</tr></table>");
@@ -515,7 +710,7 @@
 																$("#ConfirmIcon").removeClass("loading");
 																loadLiveCamera();
 																createMenu();
-																loadStoreCamera();
+																loadStoreCamera(true,"");
 			});
 		}
 			
@@ -617,13 +812,13 @@
     	 </div>
 	
 	
-		<button id=menuDisplay style=position:fixed;z-index:2000;right:-4px;top:0px class="big ui icon button">
+		<button id=menuDisplay style=position:fixed;z-index:2000;right:-4px;top:5px;height:37px class="big ui icon button">
   			<i class="bars icon"></i>
 		</button>
 		
 		
 		
-		<div id=menu style=display:none;position:fixed;z-index:2000;right:-4px;top:42px; class="ui compact vertical labeled icon menu">
+		<div id=menu style=display:none;position:fixed;z-index:2000;right:-4px;top:43px; class="ui compact vertical labeled icon menu">
 			  <a class="item">
 			    <i id=setPath class="home icon"></i>
 			    Set kerberos.io path
@@ -631,6 +826,10 @@
 			  <a class="item">
 			    <i onclick=javascript:window.open('https://github.com/coxifred/PimpMyKerberos') class="github icon"></i>
 			   PimpMyKerberos
+			  </a>
+			  <a class="item">
+			    <i id=showChart class="chart line icon"></i>
+			   Graphical Highlights
 			  </a>
 			  <a class="item">
 				<i id=cleanAll class="trash icon"></i>
@@ -671,7 +870,7 @@
 		
 		
 	
-		<div id=time style=position:fixed;z-index:1000;top:15px;right:250px;color:white></div> 
+		<div id=time style=position:fixed;z-index:1000;top:15px;left:2px;color:white></div> 
 		<div style=position:fixed;z-index:1000;top:5px;right:50px class="ui calendar" >
 			    <div class="ui input left icon">
 			      <i class="calendar icon"></i>
@@ -682,7 +881,7 @@
 
  			
 
-<div id=cameraHeader style=position:fixed;z-index:1000;top:42px;margin-left:20px;margin-right:20px;width:100%>
+<div id=cameraHeader style=position:fixed;z-index:1000;top:44px;margin-left:20px;margin-right:20px;width:100%>
 
 </div>
 
@@ -693,7 +892,7 @@
 	
 
 
-<div id=camContent style=position:relative;top:350px;margin-left:25px;margin-right:24px;width:100%;left:-3px;height:100%;background-color:white; >
+<div id=camContent style=position:relative;top:420px;margin-left:25px;margin-right:24px;width:100%;left:-3px;height:100%;background-color:white; >
   
 </div>
 	
@@ -781,6 +980,14 @@
   </div>
 </div>
 
-	
+<div id=showChartModal style=display:none;z-index:3000;width:100%;height:420px;top:0px;position:fixed; >
+  <div id=canvasContent style=height:600px;width:100% class="content">
+    <canvas id="myChart" width="800" height="170"></canvas>
+  </div>
+  <div id=hideChartModal style=position:relative;top:-300px class="tiny teal ui approve button">Hide</div>
+  
+</div>
+
+
 </body>
 </html>

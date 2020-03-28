@@ -7,6 +7,9 @@ body {
  background-size: cover; /* version standardis�e */
 }
 
+body::-webkit-scrollbar {
+  display: none;
+}
 
 /* unvisited link */
 a:link {

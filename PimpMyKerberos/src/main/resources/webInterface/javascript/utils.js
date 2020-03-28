@@ -5,7 +5,11 @@
     include("javascript/login.js");
 	include("javascript/semantic.js");        
 	include("javascript/calendar.min.js");        
-	include("javascript/jquery-websocket.js"); 
+	include("javascript/jquery-websocket.js");
+	include("javascript/moment.js");
+	include("javascript/moment-timezone.js");  
+	include("javascript/Chart.js");
+	
 	function s4() {
 		    return Math.floor((1 + Math.random()) * 0x10000)
 		      .toString(16)

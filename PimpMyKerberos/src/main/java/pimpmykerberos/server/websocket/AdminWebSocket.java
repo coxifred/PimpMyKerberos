@@ -63,7 +63,7 @@ public class AdminWebSocket implements WebSocketListener {
 		String messageJson=aGson.toJson(message);
 		List<Integer> toClean=new ArrayList<Integer>();
 		Fonctions.trace("DBG",allSessions.size() + " sessions in cache before sending message","AdminWebSocket");
-		for (Session sess : allSessions.values()) {
+		for (Session sess : getAllSessions().values()) {
 			try {
 				sess.getRemote().sendString(messageJson);
 			} catch (Exception e) {
@@ -87,7 +87,7 @@ public class AdminWebSocket implements WebSocketListener {
 		this.close = close;
 	}
 
-	public static Map<Integer, Session> getAllSessions() {
+	public static synchronized Map<Integer, Session> getAllSessions() {
 		return allSessions;
 	}
 
