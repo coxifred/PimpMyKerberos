@@ -97,6 +97,31 @@ What **pimpMyKerberos** doesn't do:
   
   If you're in docker mode, configuration file should be in configFile/aCore.xml (under the place you git project)
   
+  ```xml
+  <pimpmykerberos.core.Core>
+    <coreFile>./configFile/aCore.xml</coreFile>          <!-- Config file, for information only, read-only-->
+    <webServerPort>443</webServerPort>                   <!-- Port for https-->
+    <webSocketPort>4430</webSocketPort>                  <!-- Port for websocket, not used, read only-->
+    <debug>true</debug>                                  <!-- Debug mode true|false-->
+    <timeBetweenScan>60000</timeBetweenScan>             <!-- Time (in ms) between 2 directory analysis -->
+    <debugJetty>false</debugJetty>                       <!-- Debug mode for jetty true|false -->
+    <adminPassword>admin</adminPassword>                 <!-- Password for admin -->
+    <maxLogEntries>1000</maxLogEntries>                  <!-- Max logs in memory -->
+    <kerberosioPath>Z:\kerberos.io</kerberosioPath>      <!-- Path to kerberos structure, containing camera dir-->
+    <maxDisplayLineInGUI>5</maxDisplayLineInGUI>         <!-- Crunch size in GUI -->
+    <daysBeforePurge>30</daysBeforePurge>                <!-- After x days, older files are cleaned-->
+    <maxDisplayColumnInGUI>6</maxDisplayColumnInGUI>     <!-- Max Columns in GUI -->
+    <nightMode>0</nightMode>                             <!-- 1 for Night (black background) , 0 for day (white background) -->
+    <muteMode>0</muteMode>                               <!-- Mute mode 1 for no message on GUI, 0 for messages-->
+    <sessionId>0</sessionId>                             <!-- Not used -->
+    <dataPath></dataPath>                                <!-- Not used -->
+    <influxDbUrl></influxDbUrl>                          <!-- Url of a influxDb, files recorded by hour by cam, if empty no send -->
+    <influxDbName>pimpMyKerberos</influxDbName>          <!-- influxDb database name -->
+    <influxDbUser>root</influxDbUser>                    <!-- influxDb account -->
+    <influxDbPasswd>root</influxDbPasswd>                <!-- influxDb passwd -->
+</pimpmykerberos.core.Core>
+```
+  
 ## Update <a name="chapter-6"></a>  
 
 ```bash
