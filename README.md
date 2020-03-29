@@ -51,7 +51,7 @@ What **pimpMyKerberos** doesn't do:
  For a pimpMyKerberos docker container:
  
  ```bash
- docker pull 
+ docker pull coxifred/pimpmykerberos:1.0
  ```
 
 ## Installation in hostMode with gradle compilation<a name="chapter-5"></a>
