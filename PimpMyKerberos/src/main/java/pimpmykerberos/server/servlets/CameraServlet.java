@@ -143,7 +143,8 @@ public class CameraServlet extends AbstractServlet {
 				  response.getWriter().write(toGson(Core.getInstance().getTimeline().extractByHour()));
 				 }catch (Exception e)
 				 {
-					 Fonctions.trace("ERR", "Couldn't extract files amout by hour ", "CameraServlet");
+					 Fonctions.trace("ERR", "Couldn't extract files amout by hour " + e.getMessage(), "CameraServlet");
+					 e.printStackTrace();
 				 }
 				
 			}
@@ -159,7 +160,7 @@ public class CameraServlet extends AbstractServlet {
   				    Integer count=Core.getInstance().cleanAll();
 					response.getWriter().write(count.toString());
 				} catch (IOException e) {
-					 Fonctions.trace("ERR", "Couldn't clean all cam", "CameraServlet");
+					 Fonctions.trace("ERR", "Couldn't clean all cam " + e.getMessage(), "CameraServlet");
 				}
 			}
 		}
