@@ -17,7 +17,7 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
   
 ## Screenshots <a name="chapter-1"></a>  
 
-<p align="center"><video preload="metadata" forceDisplay loop="true" muted autoplay="true" width=335 controls src="https://github.com/coxifred/pimpMyKerberos/blob/master/resources/https___192.168.2.50%20-%20Google%20Chrome%202020-03-29%2023-25-05.mp4" /> </p>
+<p align="center"><img src=https://github.com/coxifred/pimpMyKerberos/blob/master/resources/pimpMyKerberos.gif?raw=true /></p>
 
 ## Under the hood <a name="chapter-2"></a>
 
@@ -139,3 +139,4 @@ then relaunch the appropriate installation mode.
 ## Next features <a name="chapter-10"></a>  
 
 Mobile responsive.
+Reduce javascript memory leak from html5 video tag.
