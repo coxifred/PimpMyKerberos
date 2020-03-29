@@ -9,4 +9,5 @@ echo "Helper : "
 
 echo "docker system prune --all --volumes --force"
 echo "docker volume prune -f"
-
+echo "docker volume rm $(docker volume ls -qf dangling=true)"
+echo "find /var/lib/docker/containers/ -type f -name \"*.log\" -delete"
