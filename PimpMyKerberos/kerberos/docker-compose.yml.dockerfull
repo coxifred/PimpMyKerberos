@@ -1,13 +1,14 @@
 version: "2"
 services:
   "pimpmykerberos":
-    image: "pimpmykerberos/pimpmykerberos"
+    image: "coxifred/pimpmykerberos:1.0"
     container_name: "pimpmykerberos"
     restart: always
     ports:
       - "443:443"
       - "80:80"
     volumes:
+      - /kerberos/pimpMyKerberos:/pimpMyKerberos/config:Z
       - /kerberos:/kerberos:Z
 
   "camera1_name":
@@ -61,4 +62,3 @@ services:
       - /kerberos/camera4_name/config:/etc/opt/kerberosio/config:Z
       - /kerberos/camera4_name/logs:/etc/opt/kerberosio/logs:Z
       - /kerberos/camera4_name/webconfig:/var/www/web/config:Z
-
