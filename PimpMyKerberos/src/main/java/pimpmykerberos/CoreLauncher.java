@@ -39,6 +39,8 @@ public class CoreLauncher {
 		} catch (Exception e) {
 			e.printStackTrace();
 			printUsage(configCore);
+			Fonctions.trace("INF", "Exiting in 60s, let you time to investigate", "CORE");
+			Fonctions.attendre(60000);
 			System.exit(1);
 		}
 
