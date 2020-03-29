@@ -17,6 +17,8 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
   
 ## Screenshots <a name="chapter-1"></a>  
 
+<p align="center"><video preload="metadata" forceDisplay loop="true" muted autoplay="true" width=335 controls src="https://github.com/coxifred/pimpMyKerberos/blob/master/resources/https___192.168.2.50%20-%20Google%20Chrome%202020-03-29%2023-25-05.mp4" /> </p>
+
 ## Under the hood <a name="chapter-2"></a>
 
 **pimpMyKerberos** is a small footprint java (jetty) server which unify all your cameras in one single interface. As [Kerberos.io](https://kerberos.io), it displays your captures with chronology, but this time will all cameras time-synchronized (Interesting if you want to correlate some events on multiple locations). **pimpMyKerberos** scans capture's directories and sort files by time. Also works with every CCTV system which dump pictures or mp4 captures. **pimpMyKerberos** provides an https access broadcasting your local network cameras.
