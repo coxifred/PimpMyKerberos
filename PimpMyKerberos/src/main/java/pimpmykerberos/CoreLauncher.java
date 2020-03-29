@@ -48,7 +48,7 @@ public class CoreLauncher {
 
 	private static void printUsage(String receivedCoreConfig) {
 		Fonctions.trace("WNG", "I received CoreConfigFile=" + receivedCoreConfig, "CORE");
-		Fonctions.trace("DEAD", "Usage java -jar pimpMyKerberos.jar <CoreConfigFile>", "CORE");
+		Fonctions.trace("INF", "Usage java -jar pimpMyKerberos.jar <CoreConfigFile>", "CORE");
 	}
 
 }
