@@ -1,0 +1,12 @@
+TOP_STORAGE=$(du -hs /var/lib/docker/overlay2/* | grep -Ee '^[0-9]{3}[M]+|[0-9]G' | sort -h |tail -n 10 |tee -a /dev/stderr |awk '{print $2}'|xargs|sed 's/ /|/g')
+docker inspect $(docker ps -q) | jq '.[]|.Config.Hostname,.Config.Labels."io.kubernetes.pod.name",.GraphDriver.Data.MergedDir,.hovno' | egrep -B2 "$TOP_STORAGE"
+docker image inspect $(docker images -aq) | jq '.[]|.RepoDigests[0],.GraphDriver.Data.MergedDir,.hovno' |egrep -B2 "$TOP_STORAGE" 
+
+docker inspect $(docker ps -q) | jq '.[]|.Config.Hostname,.Config.Labels."io.kubernetes.pod.name",.GraphDriver.Data.MergedDir,.hovno' | egrep -B2 "$TOP_STORAGE"
+
+echo ""
+echo "Helper : "
+
+echo "docker system prune --all --volumes --force"
+echo "docker volume prune -f"
+
