@@ -20,6 +20,7 @@
 		var timeLineId=1;
 		var chart="";
 		var canvas="";
+		var camData; var datasets;
 		var ctx="";
 		var lastScrollTop = 0;
 		
@@ -168,8 +169,8 @@
 		
 			
 			$("#hideChartModal").click(function (e){
-				$("#showChartModal").transition('slide down');
-			
+					$("#showChartModal").transition('slide down');
+				
 			});
 			
 			$("#showChart").click(function (e){
@@ -227,8 +228,8 @@
 				 	{
 					console.log(e);
 					}
-				});
-				var camData = {
+				
+				camData = {
 				datasets: datasets
 				};
 				
@@ -286,35 +287,41 @@
 				//Compute Chart
 				console.log("Reset chart ? " + chart);
 				if ( chart != ""){
+					console.log("Reset chart ");
 					chart.datas=camData;
 					chart.update();
 					
 				}else
 				{
-				chart = new Chart(ctx, {
-						    type: 'line',
-							data: camData,
-							options: chartOptions
-						});
-				
-				canvas=document.getElementById('myChart');
-				canvas.onclick = function(evt) {
-				  var activePoint = chart.getElementAtEvent(event);
-				
-				  // make sure click was on an actual point
-				  if (activePoint.length > 0) {
-				    var clickedDatasetIndex = activePoint[0]._datasetIndex;
-				    var clickedElementindex = activePoint[0]._index;
-				    var value = chart.data.datasets[clickedDatasetIndex].data[clickedElementindex];    
-					timeLineJson=""; 
-					loadStoreCamera(true,"&startCrunch=" +Date.parse(value.x));
-				    //alert();
-				  }
+					
+					
+					canvas=document.getElementById('myChart');
+								canvas.onclick = function(evt) {
+								  var activePoint = chart.getElementAtEvent(event);
+								
+														  // make sure click was on an actual point
+														  if (activePoint.length > 0) {
+														    var clickedDatasetIndex = activePoint[0]._datasetIndex;
+														    var clickedElementindex = activePoint[0]._index;
+														    var value = chart.data.datasets[clickedDatasetIndex].data[clickedElementindex];    
+															timeLineJson=""; 
+															loadStoreCamera(true,"&startCrunch=" +Date.parse(value.x));
+														    //alert();
+														  }
+								}
+								
+					chart = new Chart(ctx, {
+							    type: 'line',
+								data: camData,
+								options: chartOptions
+							});
+							chart.render();
 				}
-				}
 				
-				$('#showChartModal').transition('slide down')
+				$('#showChartModal').transition('slide down');
+				
 				toggleMenu();
+				});
  			});
 			
 			$("#cleanAll").click(function(e){
