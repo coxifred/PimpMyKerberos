@@ -641,7 +641,7 @@
 								 if ( timeLine[k].pathToMedia.endsWith(".mp4"))
 									{
 										 
-										 html += "<video id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
+										 html += "<video preload=\"metadata\" id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
 									}else if (timeLine[k].pathToMedia.endsWith(".jpg"))
 									{
 										 console.log(timeLine[k].pathToMedia);

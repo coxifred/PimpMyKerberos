@@ -5,6 +5,7 @@ import java.util.List;
 public class Service {
 	String image;
 	String container_name;
+	String network_mode;
 	String restart;
 	List<String> ports;
 	List<String> volumes;
@@ -37,6 +38,12 @@ public class Service {
 	}
 	public void setVolumes(List<String> volumes) {
 		this.volumes = volumes;
+	}
+	public String getNetwork_mode() {
+		return network_mode;
+	}
+	public void setNetwork_mode(String network_mode) {
+		this.network_mode = network_mode;
 	}
 	
 	

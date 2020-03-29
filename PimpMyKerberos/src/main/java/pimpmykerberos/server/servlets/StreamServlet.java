@@ -27,9 +27,8 @@ public class StreamServlet extends HttpServlet {
 		ServletOutputStream out;
 		String url = request.getParameter("url");
 		// Try to look if it's a local file
-		File localFile=new File(url);
-		if ( localFile.exists())
-		{
+		File localFile = new File(url);
+		if (localFile.exists()) {
 			Fonctions.trace("DBG", "It's a local file " + url + " trying to diplay", "StreamServlet");
 			try {
 				out = response.getOutputStream();
@@ -40,68 +39,82 @@ public class StreamServlet extends HttpServlet {
 				while ((ch = fin.read()) != -1) {
 					out.write(ch);
 				}
-	
-			
+
 				fin.close();
-			
+
 				out.close();
-			}catch (Exception e)
-			{
+			} catch (Exception e) {
 				Fonctions.trace("ERR", "Can't display local file " + url, "StreamServlet");
 			}
-			
-		}else
-		{
-			
-		
-		
-		
-		
-		
-		try {
-			out = response.getOutputStream();
-			
-			Fonctions.trace("DBG", "Start streaming to " + url, "StreamServlet");
-			InputStream fin = new URL(url).openStream();
-			BufferedInputStream bin = new BufferedInputStream(fin);
-			BufferedOutputStream bout = new BufferedOutputStream(out);
-			response.setContentType("multipart/x-mixed-replace; boundary=mjpegstream");
-			int ch = 0;
-			;
-			while ((ch = bin.read()) != -1) {
-				bout.write(ch);
-			}
 
-			bin.close();
-			fin.close();
-			bout.close();
-			out.close();
-		} catch (Exception e) {
-			Message aMessage = new Message();
-			aMessage.setAction("RELOAD");
-			aMessage.setMessage("Couldn't streaming to " + url + " " + e.getMessage());
-			AdminWebSocket.broadcastMessage(aMessage);
-			Fonctions.trace("ERR", "Couldn't stream to " + url + " generally because ip is different from kerberos.io ip, if pimpMyKerberos is on same server, you can force ip to aCore.xml <webServerIp>same_as_kerberos.io</webServerIp>, or either set <ip>kerberos.io ip</ip> under each camera in aCore.xml", "StreamServlet");
-				try {
-				InputStream fin = StreamServlet.class.getResourceAsStream("/webInterface/images/wolf.png");
+		} else {
+
+			try {
 				out = response.getOutputStream();
+
+				Fonctions.trace("DBG", "Start streaming to " + url, "StreamServlet");
+				InputStream fin = new URL(url).openStream();
+				BufferedInputStream bin = new BufferedInputStream(fin);
+				BufferedOutputStream bout = new BufferedOutputStream(out);
+				response.setContentType("multipart/x-mixed-replace; boundary=mjpegstream");
 				int ch = 0;
 				;
-				while ((ch = fin.read()) != -1) {
-					out.write(ch);
+				while ((ch = bin.read()) != -1) {
+					bout.write(ch);
 				}
-	
-			
+
+				bin.close();
 				fin.close();
-			
+				bout.close();
 				out.close();
-			
-				
-			} catch (Exception e1) {
-				Fonctions.trace("ERR", "Couldn't send defaut image " + e1.getMessage(), "StreamServlet");
-				e1.printStackTrace();
-			}}
-		
+			} catch (Exception e) {
+				try {
+					out = response.getOutputStream();
+
+					Fonctions.trace("ERR", "Too bad streaming to localhost because " + url + " error was " + e.getMessage(), "StreamServlet");
+					url="localhost";
+					InputStream fin = new URL(url).openStream();
+					BufferedInputStream bin = new BufferedInputStream(fin);
+					BufferedOutputStream bout = new BufferedOutputStream(out);
+					response.setContentType("multipart/x-mixed-replace; boundary=mjpegstream");
+					int ch = 0;
+					;
+					while ((ch = bin.read()) != -1) {
+						bout.write(ch);
+					}
+
+					bin.close();
+					fin.close();
+					bout.close();
+					out.close();
+				} catch (Exception e2) {
+
+					Message aMessage = new Message();
+					aMessage.setAction("RELOAD");
+					aMessage.setMessage("Couldn't streaming to " + url + " " + e2.getMessage());
+					AdminWebSocket.broadcastMessage(aMessage);
+					Fonctions.trace("ERR", "Couldn't stream to " + url
+							+ " generally because ip is different from kerberos.io ip, if pimpMyKerberos is on same server, you can force ip to aCore.xml <webServerIp>same_as_kerberos.io</webServerIp>, or either set <ip>kerberos.io ip</ip> under each camera in aCore.xml or route issue",
+							"StreamServlet");
+					try {
+						InputStream fin = StreamServlet.class.getResourceAsStream("/webInterface/images/wolf.png");
+						out = response.getOutputStream();
+						int ch = 0;
+						;
+						while ((ch = fin.read()) != -1) {
+							out.write(ch);
+						}
+
+						fin.close();
+
+						out.close();
+
+					} catch (Exception e1) {
+						Fonctions.trace("ERR", "Couldn't send defaut image " + e1.getMessage(), "StreamServlet");
+						e1.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 
