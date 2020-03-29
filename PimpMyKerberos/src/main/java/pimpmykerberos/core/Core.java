@@ -486,7 +486,7 @@ public class Core {
 
 		// Explore cameras
 		Fonctions.trace("WNG", "Explore cameras under " + getKerberosioPath(), "CORE");
-		Core.getInstance().getUsers().get("admin").getCameras().clear();
+		HashMap<String,Camera> currentMap=new HashMap<String,Camera>();
 		if ( ! new File(getKerberosioPath()).isDirectory()) {
 			Fonctions.trace("ERR", "Path " + getKerberosioPath() + " doesn't exist anymore", "CORE");
 		} else {
@@ -550,9 +550,10 @@ public class Core {
 
 					}
 					aCamera.populate();
-					Core.getInstance().getUsers().get("admin").getCameras().put(aCamera.getName(), aCamera);
+					currentMap.put(aCamera.getName(), aCamera);
 				}
 			}
+			Core.getInstance().getUsers().get("admin").setCameras(currentMap);
 			TimeLine aTimeLine = new TimeLine();
 			aTimeLine.populate();
 			Core.getInstance().setTimeline(aTimeLine);
