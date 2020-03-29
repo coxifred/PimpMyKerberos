@@ -76,11 +76,8 @@ What **pimpMyKerberos** doesn't do:
   
   - [x] Java JDK version >= 1.8 (**yum install java-1.8.0-openjdk-devel or pkg install jdk-8**)
  
-  Download project
-  ```bash
-  git clone https://github.com/coxifred/pimpMyKerberos.git
+  Download assets (jar file) <a href=https://github.com/coxifred/pimpMyKerberos/releases>here</a>.
   
-  ```
 ## Installation in compilation mode without docker<a name="chapter-7"></a>
 
  Extra requirement:
