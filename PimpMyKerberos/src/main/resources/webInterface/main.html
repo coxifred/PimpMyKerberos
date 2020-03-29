@@ -641,7 +641,7 @@
 								 if ( timeLine[k].pathToMedia.endsWith(".mp4"))
 									{
 										 
-										 html += "<video preload=\"metadata\" id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\">not loading</video>";										
+										 html += "<video preload=\"metadata\" id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "&camName=" + timeLine[k].camName + "\">not loading</video>";										
 									}else if (timeLine[k].pathToMedia.endsWith(".jpg"))
 									{
 										 console.log(timeLine[k].pathToMedia);
@@ -681,6 +681,7 @@
 													
 				try {
 					cameraJson=JSON.parse(json);
+					console.log(cameraJson);
 					html="<table><tr>";
 					for ( i=0;i<cameraJson.length;i++)
 					{
@@ -696,7 +697,7 @@
 							html+="<button id=\"" + camera.name + "\" class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i>Seek</button>";
 							html+="<button id=\"" + camera.name + "\" class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i>Purge Files</button>";
 							html+="<button class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Settings</a></button>";
-							html+="<br><a target=new href=/stream?url=http://" + ip +":" + camera.broadcastPort + " ><img alt=\"no stream available see logs\" id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?url=http://" + ip +":" + camera.broadcastPort+"/></a>"
+							html+="<br><a target=new href=/stream?camName=" + camera.name  + "&url=http://" + ip +":" + camera.broadcastPort + " ><img alt=\"no stream available see logs\" id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?camName=" + camera.name +"&url=http://" + ip +":" + camera.broadcastPort+"/></a>"
 						html+="</td>";
 					}
 					$("#cameraHeader").html(html + "</tr></table>");

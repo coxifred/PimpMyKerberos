@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import pimpmykerberos.server.messages.Message;
-import pimpmykerberos.server.websocket.AdminWebSocket;
 import pimpmykerberos.utils.Fonctions;
 
 public class StreamServlet extends HttpServlet {
@@ -26,6 +24,7 @@ public class StreamServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		ServletOutputStream out;
 		String url = request.getParameter("url");
+		String camName = request.getParameter("camName");
 		// Try to look if it's a local file
 		File localFile = new File(url);
 		if (localFile.exists()) {
@@ -71,8 +70,10 @@ public class StreamServlet extends HttpServlet {
 				try {
 					out = response.getOutputStream();
 
-					Fonctions.trace("ERR", "Too bad streaming to localhost because " + url + " error was " + e.getMessage(), "StreamServlet");
-					url="localhost";
+					Fonctions.trace("ERR",
+							"Too bad streaming to " + camName + ":8889 because " + url + " error was " + e.getMessage(),
+							"StreamServlet");
+					url = "http://" + camName + ":8889";
 					InputStream fin = new URL(url).openStream();
 					BufferedInputStream bin = new BufferedInputStream(fin);
 					BufferedOutputStream bout = new BufferedOutputStream(out);
@@ -89,13 +90,9 @@ public class StreamServlet extends HttpServlet {
 					out.close();
 				} catch (Exception e2) {
 
-					Message aMessage = new Message();
-					aMessage.setAction("RELOAD");
-					aMessage.setMessage("Couldn't streaming to " + url + " " + e2.getMessage());
-					AdminWebSocket.broadcastMessage(aMessage);
 					Fonctions.trace("ERR", "Couldn't stream to " + url
-							+ " generally because ip is different from kerberos.io ip, if pimpMyKerberos is on same server, you can force ip to aCore.xml <webServerIp>same_as_kerberos.io</webServerIp>, or either set <ip>kerberos.io ip</ip> under each camera in aCore.xml or route issue",
-							"StreamServlet");
+							+ " generally because ip is different from kerberos.io ip, if pimpMyKerberos is on same server, you can force ip to aCore.xml <webServerIp>same_as_kerberos.io</webServerIp>, or either set <ip>kerberos.io ip</ip> under each camera in aCore.xml or route issue "
+							+ e2.getMessage(), "StreamServlet");
 					try {
 						InputStream fin = StreamServlet.class.getResourceAsStream("/webInterface/images/wolf.png");
 						out = response.getOutputStream();
@@ -110,8 +107,8 @@ public class StreamServlet extends HttpServlet {
 						out.close();
 
 					} catch (Exception e1) {
-						Fonctions.trace("ERR", "Couldn't send defaut image " + e1.getMessage(), "StreamServlet");
-						e1.printStackTrace();
+						Fonctions.trace("ERR", "Couldn't send default image " + e1.getMessage(), "StreamServlet");
+
 					}
 				}
 			}
