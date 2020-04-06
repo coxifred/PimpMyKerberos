@@ -131,9 +131,28 @@
 			$("#logout").click(function(e){
 				getValueFromUrl("admin?action=logout",true,function (){
 					top.location.href="/";
-					
 				});
 			});
+			
+			
+			
+			$("#closeDashAI").click(function(e){
+				$("#dashai").hide();
+			});
+
+			$("#trainModelButton").click(function(e){
+				$("#trainModel").show();
+				
+			});
+
+			$("#engineButton").click(function(e){
+				
+				
+				window.open("http://" +window.location.hostname + ":9000");
+				
+			});
+
+
 			
 			$("#reloadButton").click(function(e){
 				button=$(this);
@@ -148,6 +167,11 @@
 			
 			$("#declineButton").click(function(e){
 				$("#reloadMessage").transition('fade down')
+			});
+			
+			$("#ai").click(function(e){
+				$("#dashai").show();
+				$("#menu").transition('fly left');
 			});
 			
 			$("#muteButton").click(function(e){
@@ -348,6 +372,39 @@
 					loadStoreCamera(true,"");	
 					$('#purgeCounter').html(value+ "  purged file(s).");
 					$('#purgeCount').modal('show');
+				});
+			});
+			
+			$("body").delegate(".purgeable", "click", function(){
+				button=$(this);
+				button.addClass("loading");
+				id=$(this).attr("id");
+				name=$(this).attr("name");
+				getValueFromUrl("camera?action=purgeFile&id="+ id,true,function (value){
+					button.removeClass("loading");
+					console.log("Cleaning " + name);
+					$("body").find("." + name).remove();
+				});
+			});
+			
+			$("body").delegate(".trainable", "click", function(){
+				button=$(this);
+				button.addClass("loading");
+				id=$(this).attr("id");
+				name=$(this).attr("name");
+				getValueFromUrl("camera?action=trainCam&id="+ id,true,function (value){
+					button.removeClass("loading");
+					
+				});
+			});
+			
+			$("body").delegate(".keepable", "click", function(){
+				button=$(this);
+				button.addClass("loading");
+				id=$(this).attr("id");
+				name=$(this).attr("name");
+				getValueFromUrl("camera?action=keepCam&id="+ id,true,function (value){
+					button.hide();
 				});
 			});
 			
@@ -635,17 +692,21 @@
 							}else
 							{
 								html+="<td >";
-								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;width:335px><i style=z-index:200 class=\"waitingPimp notched circle loading icon\"></i></div>";
+								 html += "<div id=\"wait_" + k + "_" + timeLine[k].time + "\" style=border-radius:5px;width:335px><i style=z-index:2000 class=\"waitingPimp notched circle loading icon\"></i></div>";
 								 aDate=new Date(timeLine[k].time);
-								 html += "<div class=dateEvt ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
+								 html += "<div class=\"dateEvt " + k + "_" + timeLine[k].time + " \" ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
+						
+							 	 html+="<center><button style=position:relative;display:inline;width:30%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " trainable mini teal ui labeled icon button\"><i class=\"cog icon\"></i>Train</button>";
+								 html+="<button style=position:relative;display:inline;width:30%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " purgeable mini red ui labeled icon button\"><i class=\"trash icon\"></i>Purge</button>";
+								 html+="<button style=position:relative;width:70px;display:inline;width:30%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " keepable mini green ui labeled icon button\"><i class=\"save icon\"></i>Keep</button></center>";
 								 if ( timeLine[k].pathToMedia.endsWith(".mp4"))
 									{
 										 
-										 html += "<video preload=\"metadata\" id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "&camName=" + timeLine[k].camName + "\">not loading</video>";										
+										 html += "<video preload=\"metadata\" id=\"" + k + "_" + timeLine[k].time + "\" oncanplay=\"display('" + k +"_" + timeLine[k].time + "');\" class=\"" + k + "_" + timeLine[k].time + " videoCam timeLine" + timeLineId + " forceDisplay\" loop=\"true\" muted autoplay=\"true\" preload=\"auto\" style=display:none;border-radius:5px; width=335 controls name=\"/display?fileName=" + timeLine[k].pathToMedia + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "&camName=" + timeLine[k].camName + "\">not loading</video>";										
 									}else if (timeLine[k].pathToMedia.endsWith(".jpg"))
 									{
-										 console.log(timeLine[k].pathToMedia);
-										 html += "<img class=forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\" />";										
+										 //console.log(timeLine[k].pathToMedia);
+										 html += "<img class=\"" + k + "_" + timeLine[k].time + " forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\" />";										
 									}
 								html+="</td>";
 								//console.log(timeLine[k]);
@@ -826,7 +887,7 @@
 		
 		
 		
-		<div id=menu style=display:none;position:fixed;z-index:2000;right:-4px;top:43px; class="ui compact vertical labeled icon menu">
+		<div id=menu style=display:none;position:fixed;z-index:20000;right:-4px;top:43px; class="ui small compact vertical labeled icon menu">
 			  <a class="item">
 			    <i id=setPath class="home icon"></i>
 			    Set kerberos.io path
@@ -843,9 +904,21 @@
 				<i id=cleanAll class="trash icon"></i>
 			   	Clean old files
 			  </a>
+	 		  <a class="item">
+				<i id=keep class="save icon"></i>
+			   	Keep files
+			  </a>
 			  <a class="item">
 				<i onclick=javascript:window.open('admin?action=save') id=save class="save icon"></i>
 			   	Save config
+			  </a>
+			  <a class="item">
+				<i id=dash class="desktop icon"></i>
+			   	Dashcam
+			  </a>
+			  <a class="item">
+				<i id=ai class="cog icon"></i>
+			   	Ai Training
 			  </a>
 	 		  <a class="item">
 				<i onclick=javascript:window.open('admin?action=getLogs') id=logs class="archive icon"></i>
@@ -888,23 +961,67 @@
 			
 
  			
-
-<div id=cameraHeader style=position:fixed;z-index:1000;top:44px;margin-left:20px;margin-right:20px;width:100%>
-
-</div>
-
-
-<div id=fond style=position:fixed;z-index:500;top:0px;height:350px;width:100%;background-color:white;>
-
-</div>
+	<div id=frontal>
+		<div id=cameraHeader style=position:fixed;z-index:1000;top:44px;margin-left:20px;margin-right:20px;width:100%>
+		
+		</div>
+		
+		
+		<div id=fond style=position:fixed;z-index:500;top:0px;height:350px;width:100%;background-color:white;>
+		
+		</div>
+			
+		
+		
+		<div id=camContent style=position:relative;top:420px;margin-left:25px;margin-right:24px;width:100%;left:-3px;height:100%;background-color:white; >
+		  
+		</div>
+	</div>
 	
-
-
-<div id=camContent style=position:relative;top:420px;margin-left:25px;margin-right:24px;width:100%;left:-3px;height:100%;background-color:white; >
-  
-</div>
+	<div id=dashcam>
+		
+	</div>
 	
+	<div id=dashai style=position:fixed;display:none;top:42px;width:100%;height:100%;background-color:white;z-index:5000 >
 	
+					<div class="ui menu">
+					  <div class="item">
+					    <div id=trainModelButton class="ui olive button">Train model</div>
+					  </div>
+					  <div class="item">
+					    <div id=engineButton class="ui blue button">Display engine training</div>
+					  </div>
+					  <div class="item">
+					    <div id=closeDashAI class="ui button">Close</div>
+					  </div>
+					</div>
+		<div id=trainModel>
+			<div style=position:relative;top:-15px class="ui vertical menu">
+								  <div class="item">
+									 
+								    <button class="tiny ui button"><i class="icon plus"></i>Add new model</button>
+								  </div>
+								  <div id=items>
+									  <div class="item">
+									    <i class="microchip icon"></i> Chat
+									    <div class="menu">
+									      <a class="item">Delete</a>
+									      <a class="item">Edit</a>
+									    </div>
+									  </div>
+								  </div>
+			</div>
+			
+			
+			
+			
+			
+		</div>
+	
+			
+					
+					
+	</div>
 	
 	
 <div id=path class="ui modal">

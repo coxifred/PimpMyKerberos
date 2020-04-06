@@ -24,10 +24,10 @@ public class ThreadInflux extends Thread {
 		while (true) {
 			Fonctions.trace("DBG", "ThreadInflux analysis", "ThreadInflux");
 			try {
-			extractData();
-			} catch (Exception e)
-			{
+				extractData();
+			} catch (Exception e) {
 				Fonctions.trace("DBG", "Error while uploading info to influxDb " + e.getMessage(), "ThreadInflux");
+				e.printStackTrace();
 			}
 			Fonctions.attendre(1000 * 60 * 60);
 
@@ -50,22 +50,24 @@ public class ThreadInflux extends Thread {
 			for (File aFile : new File(Core.getInstance().getKerberosioPath()).listFiles()) {
 				if (aFile.isDirectory()) {
 
-					
-
 					List<Long> timestamps = new ArrayList<Long>();
-					for (File subFile : new File(aFile.getAbsolutePath() + File.separator + "capture").listFiles()) {
-						if (subFile.isFile() && subFile.lastModified() >= aCalendarStart.getTimeInMillis()
-								&& subFile.lastModified() < aCalendarEnd.getTimeInMillis()) {
-							timestamps.add(subFile.lastModified());
+					if (new File(aFile.getAbsolutePath() + File.separator + "capture").exists()) {
+						for (File subFile : new File(aFile.getAbsolutePath() + File.separator + "capture")
+								.listFiles()) {
+							if (subFile.isFile() && subFile.lastModified() >= aCalendarStart.getTimeInMillis()
+									&& subFile.lastModified() < aCalendarEnd.getTimeInMillis()) {
+								timestamps.add(subFile.lastModified());
 
+							}
 						}
+						camToFile.put(aFile.getName(), timestamps);
 					}
-					camToFile.put(aFile.getName(), timestamps);
 
 				}
 			}
 
-			final String serverURL = Core.getInstance().getInfluxDbUrl(), databaseName=Core.getInstance().getInfluxDbName(),
+			final String serverURL = Core.getInstance().getInfluxDbUrl(),
+					databaseName = Core.getInstance().getInfluxDbName(),
 					username = Core.getInstance().getInfluxDbUser(), password = Core.getInstance().getInfluxDbPasswd();
 			if (serverURL != null && !"".contentEquals(serverURL)) {
 
@@ -73,17 +75,13 @@ public class ThreadInflux extends Thread {
 				influxDB.setDatabase(databaseName);
 				influxDB.query(new Query("CREATE DATABASE " + databaseName));
 				for (String aKey : camToFile.keySet()) {
-					List<Long> list=camToFile.get(aKey);
+					List<Long> list = camToFile.get(aKey);
 					Integer count = list.size();
 					Fonctions.trace("DBG", count + " file(s) for camera " + aKey + " between "
 							+ aCalendarStart.getTime() + " and " + aCalendarEnd.getTime(), "ThreadInflux");
-					for ( Long aLong:list)
-					{
-						influxDB.write(Point.measurement("file_count")
-							    .time(aLong, TimeUnit.MILLISECONDS)
-							    .tag("camera", aKey)
-							    .addField("file_count", 1d)
-							    .build());
+					for (Long aLong : list) {
+						influxDB.write(Point.measurement("file_count").time(aLong, TimeUnit.MILLISECONDS)
+								.tag("camera", aKey).addField("file_count", 1d).build());
 					}
 				}
 			} else {

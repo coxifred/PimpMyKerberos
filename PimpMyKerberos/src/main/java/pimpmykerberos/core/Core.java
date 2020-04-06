@@ -29,6 +29,7 @@ import pimpmykerberos.beans.TimeLine;
 import pimpmykerberos.beans.User;
 import pimpmykerberos.beans.docker.DockerCompose;
 import pimpmykerberos.beans.docker.Service;
+import pimpmykerberos.deeplearning.DeepLearning;
 import pimpmykerberos.server.Webserver;
 import pimpmykerberos.server.messages.Message;
 import pimpmykerberos.server.websocket.AdminWebSocket;
@@ -74,6 +75,11 @@ public class Core {
 	 * Debug mode
 	 */
 	Boolean debug = false;
+	
+	/**
+	 * Deep Learning
+	 */
+	Boolean deepLearning=true;
 
 	/**
 	 * Time between camera scanning from kerberos.io
@@ -250,6 +256,11 @@ public class Core {
 		Fonctions.trace("INF", "", "CORE");
 		Fonctions.trace("INF", "", "CORE");
 
+		if ( getDeepLearning())
+		{
+			DeepLearning.getInstance().startUI();
+		}
+		
 		// Starting ThreadMemory
 		ThreadMemory tm = new ThreadMemory();
 		tm.start();
@@ -703,6 +714,14 @@ public class Core {
 
 	public void setInfluxDbPasswd(String influxDbPasswd) {
 		this.influxDbPasswd = influxDbPasswd;
+	}
+
+	public Boolean getDeepLearning() {
+		return deepLearning;
+	}
+
+	public void setDeepLearning(Boolean deepLearning) {
+		this.deepLearning = deepLearning;
 	}
 
 }
