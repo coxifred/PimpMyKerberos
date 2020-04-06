@@ -17,6 +17,8 @@ _Timing Correlation between VideoCam (based on Kerberos.io)_
   
 ## Screenshots <a name="chapter-1"></a>  
 
+<p align="center"><img src=https://github.com/coxifred/pimpMyKerberos/blob/master/resources/pimpMyKerberos.gif?raw=true /></p>
+
 ## Under the hood <a name="chapter-2"></a>
 
 **pimpMyKerberos** is a small footprint java (jetty) server which unify all your cameras in one single interface. As [Kerberos.io](https://kerberos.io), it displays your captures with chronology, but this time will all cameras time-synchronized (Interesting if you want to correlate some events on multiple locations). **pimpMyKerberos** scans capture's directories and sort files by time. Also works with every CCTV system which dump pictures or mp4 captures. **pimpMyKerberos** provides an https access broadcasting your local network cameras.
@@ -49,7 +51,7 @@ What **pimpMyKerberos** doesn't do:
  For a pimpMyKerberos docker container:
  
  ```bash
- docker pull 
+ docker pull coxifred/pimpmykerberos:1.0
  ```
 
 ## Installation in hostMode with gradle compilation<a name="chapter-5"></a>
@@ -74,11 +76,8 @@ What **pimpMyKerberos** doesn't do:
   
   - [x] Java JDK version >= 1.8 (**yum install java-1.8.0-openjdk-devel or pkg install jdk-8**)
  
-  Download project
-  ```bash
-  git clone https://github.com/coxifred/pimpMyKerberos.git
+  Download assets (jar file) <a href=https://github.com/coxifred/pimpMyKerberos/releases>here</a>.
   
-  ```
 ## Installation in compilation mode without docker<a name="chapter-7"></a>
 
  Extra requirement:
@@ -137,3 +136,4 @@ then relaunch the appropriate installation mode.
 ## Next features <a name="chapter-10"></a>  
 
 Mobile responsive.
+Reduce javascript memory leak from html5 video tag.
