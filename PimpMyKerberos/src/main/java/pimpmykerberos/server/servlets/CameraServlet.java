@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 
 import pimpmykerberos.beans.Directory;
+import pimpmykerberos.beans.KeepCam;
 import pimpmykerberos.beans.User;
 import pimpmykerberos.core.Core;
 import pimpmykerberos.utils.Fonctions;
@@ -65,6 +67,10 @@ public class CameraServlet extends AbstractServlet {
 			case "getTimeLine":
 				getTimeLine(request, response);
 				break;
+			case "getKeep":
+				getKeep(request, response);
+				break;
+				
 			case "getFileByHour":
 				getFileByHour(request, response);
 				break;
@@ -86,6 +92,9 @@ public class CameraServlet extends AbstractServlet {
 			case "cleanAll":
 				cleanAll(request, response);
 				break;
+			case "purgeAllKeep":
+				purgeAllKeep(request, response);
+				break;
 			case "fromDay":
 				fromDay(request, response);
 				break;
@@ -93,6 +102,41 @@ public class CameraServlet extends AbstractServlet {
 			}
 		}
 
+	}
+
+	private void getKeep(HttpServletRequest request, HttpServletResponse response) {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				
+					try {
+						// Trying create directory
+						List<KeepCam> keepCams=new ArrayList<KeepCam>();
+						Fonctions.trace("DBG", "Looking into " + Core.getInstance().getKerberosioPath()
+								+ "/pimpMyKerberos/keep", "CameraServlet");
+						File aFile = new File(Core.getInstance().getKerberosioPath() + "/pimpMyKerberos/keep");
+						if ( aFile.exists() )
+						{
+							for (File aKeepFile:aFile.listFiles())
+							{
+								KeepCam aKeepCam=new KeepCam();
+								aKeepCam.setPathToMedia(aKeepFile.getAbsolutePath());
+								aKeepCam.setTime(new Date(aKeepFile.lastModified()));
+								aKeepCam.setId(UUID.randomUUID().toString().replaceAll(" ", ""));
+								keepCams.add(aKeepCam);
+							}
+							
+						}
+						Fonctions.trace("DBG", keepCams.size() + " keepFiles found", "CameraServlet");
+						response.getWriter().write(toGson(keepCams));
+					} catch (Exception e) {
+						Fonctions.trace("ERR", "Couldn't read " + Core.getInstance().getKerberosioPath()
+								+ "/pimpMyKerberos/keep " + e.getMessage(), "CameraServlet");
+					}
+				
+			}
+		}
+		
 	}
 
 	private void keepCam(HttpServletRequest request, HttpServletResponse response) {
@@ -121,6 +165,35 @@ public class CameraServlet extends AbstractServlet {
 			}
 		}
 	}
+	
+	
+	private void purgeAllKeep(HttpServletRequest request, HttpServletResponse response) {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+					try {
+						Fonctions.trace("DBG", "Cleaning directory " + Core.getInstance().getKerberosioPath() + "/pimpMyKerberos/keep", "CameraServlet");
+						File aDir=new File( Core.getInstance().getKerberosioPath() + "/pimpMyKerberos/keep");
+						if ( aDir.isDirectory() )
+						{
+							for ( File aFile:aDir.listFiles())
+							{
+								FileUtils.forceDelete(aFile);
+							}
+						}
+						else
+						{
+							Fonctions.trace("ERR", Core.getInstance().getKerberosioPath() + "/pimpMyKerberos/keep doesn't exists", "CameraServlet");
+						}
+
+					} catch (Exception e) {
+						Fonctions.trace("ERR", "Error while cleaning keep directory " + e.getMessage(), "CameraServlet");
+					}
+				
+			}
+		}
+	}
+
 
 	private void purgeFile(HttpServletRequest request, HttpServletResponse response) {
 		User requester = (User) request.getSession().getAttribute("USER");

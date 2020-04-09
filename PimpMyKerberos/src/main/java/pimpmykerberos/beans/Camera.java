@@ -23,6 +23,7 @@ public class Camera {
 	Integer broadcastPort;
 	Date freshDate;
 	transient TreeMap<Long, String> timeToFile = new TreeMap<Long, String>();
+	TreeMap<Long, Integer> fileByHour = new TreeMap<Long, Integer>();
 
 	public void populate() {
 		File captureDir = new File(capturePath);
@@ -43,6 +44,16 @@ public class Camera {
 				aMessage.setAction("RELOAD");
 				aMessage.setMessage("New detection from " + name);
 				AdminWebSocket.broadcastMessage(aMessage);
+				Calendar aCalendar = Calendar.getInstance();
+				aCalendar.setTimeInMillis(timeToFile.lastKey());
+				aCalendar.set(Calendar.MINUTE, 0);
+				aCalendar.set(Calendar.SECOND, 0);
+				aCalendar.set(Calendar.MILLISECOND, 0);
+				Integer count = 1;
+				if (fileByHour.containsKey(aCalendar.getTimeInMillis())) {
+					count += fileByHour.get(aCalendar.getTimeInMillis());
+				}
+				fileByHour.put(aCalendar.getTimeInMillis(), count);
 			}
 			freshDate = aNewfreshDate;
 			Fonctions.trace("DBG",
@@ -178,6 +189,14 @@ public class Camera {
 		} else {
 			return Long.MAX_VALUE;
 		}
+	}
+
+	public TreeMap<Long, Integer> getFileByHour() {
+		return fileByHour;
+	}
+
+	public void setFileByHour(TreeMap<Long, Integer> fileByHour) {
+		this.fileByHour = fileByHour;
 	}
 
 }

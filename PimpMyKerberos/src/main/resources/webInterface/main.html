@@ -50,7 +50,7 @@
 			$("html, body").animate({ scrollTop: 0 }, "slow");
 			loadCore();
 			WebSocketClient.open(url("hello")); 
-			reloadMemory();reloadSpace();loadLiveCamera();setNightMode(nightMode);
+			reloadMemory();reloadSpace();setNightMode(nightMode);
 			loadStoreCamera(true,"");
 		
 			setInterval(reloadMemory, 10000);
@@ -137,7 +137,7 @@
 			
 			
 			$("#closeDashAI").click(function(e){
-				$("#dashai").hide();
+				$("#dashai").transition('fade down');
 			});
 
 			$("#trainModelButton").click(function(e){
@@ -167,6 +167,76 @@
 			
 			$("#declineButton").click(function(e){
 				$("#reloadMessage").transition('fade down')
+			});
+			
+			
+			$("#keepButton").click(function(e){
+				showKeep();
+			});
+			
+			$("#dash").click(function(e){
+				$("#dashcam").show();
+			});
+			
+			$("#dashClose").click(function(e){
+				$("#dashcam").hide();
+			});
+			
+			$("#keepPurgeAllButton").click(function(e){
+				button=$(this);
+				button.addClass("loading");
+				getValueFromUrl("camera?action=purgeAllKeep",true,function(json){
+					button.removeClass("loading");
+					 $("#keepContent").html("");
+					});
+			});
+			
+			
+			function showKeep()
+			{
+				
+				$("#keep").show();
+				getValueFromUrl("camera?action=getKeep",true,function(json){
+													
+				try {
+					keepJson=JSON.parse(json);
+					
+					html="";
+					for ( i=0;i<keepJson.length;i++)
+					{
+						
+						aDate=new Date(keepJson[i].time);
+						html+= "<div style=width:150px;float:left>"
+								html+="<div class=\"" + keepJson[i].id + "\" ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
+								
+								html+="<button style=position:relative;display:inline;width:100%; name=\"" + keepJson[i].id + "\" id=\"" + keepJson[i].pathToMedia + "\" class=\"" + keepJson[i].id + " purgeable mini red ui labeled icon button\"><i class=\"trash icon\"></i>Purge</button>";
+								
+								 if ( keepJson[i].pathToMedia.endsWith(".mp4"))
+									{
+										html+= "<video class=\"" + keepJson[i].id + "\" muted style=border-radius:5px; width=150 controls src=\"/display?fileName=" + keepJson[i].pathToMedia + "\" >not loading</video>";
+									}else if (keepJson[i].pathToMedia.endsWith(".jpg"))
+									{
+										 html+= "<img class=\"" + keepJson[i].id + "\" forceDisplay width=150 id=\"" + keepJson[i].id + "\" src=\"/display?fileName=" + keepJson[i].pathToMedia + "\" />";										
+									}
+						html+="</div>";
+					}
+										
+				    
+					
+				    $("#keepContent").html(html);
+					
+						
+				} catch (e)
+				{
+					console.log(e);
+				}
+				});
+				
+			
+			}
+			
+			$("#closeKeep").click(function(e){
+				$("#keep").hide();
 			});
 			
 			$("#ai").click(function(e){
@@ -200,7 +270,8 @@
 			$("#showChart").click(function (e){
 				datasets=new Array();
 				ctx = document.getElementById('myChart').getContext('2d');
-				
+				button=$(this);
+				button.addClass("loading");
 				
 				getValueFromUrl("camera?action=getFileByHour",true,function(json){
 													
@@ -343,7 +414,7 @@
 				}
 				
 				$('#showChartModal').transition('slide down');
-				
+				button.removeClass("loading");
 				toggleMenu();
 				});
  			});
@@ -404,7 +475,7 @@
 				id=$(this).attr("id");
 				name=$(this).attr("name");
 				getValueFromUrl("camera?action=keepCam&id="+ id,true,function (value){
-					button.hide();
+					button.removeClass("loading");
 				});
 			});
 			
@@ -486,6 +557,15 @@
 													{
 														$('#nightCheck').checkbox('set checked');
 													}
+													
+													$("#labelPurge").html("Purge files > " + core.daysBeforePurge + "d");
+													$("#keepPurgeButton").html("Purge files > " + core.daysBeforePurgeKeeped + "d");
+													$("#menuDash").dropdown({
+																    clearable: true
+													})
+													loadLiveCamera();
+													
+													
 												} catch (e)
 												{
 													console.log(e);
@@ -696,9 +776,9 @@
 								 aDate=new Date(timeLine[k].time);
 								 html += "<div class=\"dateEvt " + k + "_" + timeLine[k].time + " \" ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
 						
-							 	 html+="<center><button style=position:relative;display:inline;width:30%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " trainable mini teal ui labeled icon button\"><i class=\"cog icon\"></i>Train</button>";
-								 html+="<button style=position:relative;display:inline;width:30%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " purgeable mini red ui labeled icon button\"><i class=\"trash icon\"></i>Purge</button>";
-								 html+="<button style=position:relative;width:70px;display:inline;width:30%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " keepable mini green ui labeled icon button\"><i class=\"save icon\"></i>Keep</button></center>";
+							 	 html+="<center><button style=position:relative;display:inline;width:33%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " trainable mini teal ui labeled icon button\"><i class=\"cog icon\"></i>Train</button>";
+								 html+="<button style=position:relative;display:inline;width:32%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " purgeable mini red ui labeled icon button\"><i class=\"trash icon\"></i>Purge</button>";
+								 html+="<button style=position:relative;width:70px;display:inline;width:32%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " keepable mini green ui labeled icon button\"><i class=\"save icon\"></i>Keep</button></center>";
 								 if ( timeLine[k].pathToMedia.endsWith(".mp4"))
 									{
 										 
@@ -706,7 +786,7 @@
 									}else if (timeLine[k].pathToMedia.endsWith(".jpg"))
 									{
 										 //console.log(timeLine[k].pathToMedia);
-										 html += "<img class=\"" + k + "_" + timeLine[k].time + " forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\" />";										
+										 html += "<img class=\"" + k + "_" + timeLine[k].time + "\" forceDisplay width=335 id=\"" + k + "_" + timeLine[k].time + "\" src=\"/display?fileName=" + timeLine[k].pathToMedia + "\" />";										
 									}
 								html+="</td>";
 								//console.log(timeLine[k]);
@@ -755,9 +835,9 @@
 							ip=window.location.hostname;
 						}
  						html+="<td>";
-							html+="<button id=\"" + camera.name + "\" class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i>Seek</button>";
-							html+="<button id=\"" + camera.name + "\" class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i>Purge Files</button>";
-							html+="<button class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Settings</a></button>";
+							html+="<button style=width:23% id=\"" + camera.name + "\" class=\"seekable tiny red ui labeled icon button\"><i class=\"angle double down icon\"></i>Seek</button>";
+							html+="<button style=width:45% id=\"" + camera.name + "\" class=\"cleanable tiny orange ui labeled icon button\"><i class=\"trash icon\"></i>Purge Files > " + core.daysBeforePurge +"d</button>";
+							html+="<button style=width:25% class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Tune</a></button>";
 							html+="<br><a target=new href=/stream?camName=" + camera.name  + "&url=http://" + ip +":" + camera.broadcastPort + " ><img alt=\"no stream available see logs\" id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000 width=335px src=/stream?camName=" + camera.name +"&url=http://" + ip +":" + camera.broadcastPort+"/></a>"
 						html+="</td>";
 					}
@@ -869,7 +949,7 @@
 			</div>
 		</div>
 		
-		<div id=spaceBlock class=memory style=position:fixed;bottom:1px;height:40px;width:100%;z-index:1000;background-color:white>
+		<div id=spaceBlock class=memory style=position:fixed;bottom:1px;height:40px;width:100%;z-index:8000;background-color:white>
 		    <div id=space style=width:100% class="ui tiny indicating progress">
 	  			<div class="bar"></div>
 	  			<div id=spaceColor style="color:black;" class="label">Space</div>
@@ -902,10 +982,10 @@
 			  </a>
 			  <a class="item">
 				<i id=cleanAll class="trash icon"></i>
-			   	Clean old files
+			   	<div id=labelPurge>Clean old files</div>
 			  </a>
 	 		  <a class="item">
-				<i id=keep class="save icon"></i>
+				<i id=keepButton class="save icon"></i>
 			   	Keep files
 			  </a>
 			  <a class="item">
@@ -978,10 +1058,93 @@
 		</div>
 	</div>
 	
-	<div id=dashcam>
-		
+	<div id=dashcam style=position:fixed;overflow-y:scroll;left:10px;display:none;top:42px;width:100%;height:100%;background-color:white;z-index:5000 >
+		<div class="ui menu">
+					  <div class="item">
+					    <div id=dashCleanButton class="ui olive button">Clean Dash</div>
+					  </div>
+					  <div class="item">
+					    <div id=dashSaveButton class="ui red button">Save Dash</div>
+					  </div>
+					  <div class="item">
+					    <div id=dashSetDefaultButton class="ui pink button">Set as default page</div>
+					  </div>
+					  <div class="item">
+					    <div id=dashRemoveDefaultButton class="ui blue button">Remove from default page</div>
+					  </div>
+					  <div class="item">
+					    <div id=closeDashCam class="ui button">Close</div>
+					  </div>
+					  <div class="item">
+						<div id=menuDash class="ui dropdown">
+						  <div class="text">File</div>
+						  <i class="dropdown icon"></i>
+						  <div class="menu">
+						    <div class="item">New</div>
+						    <div class="item">
+						      <span class="description">ctrl + o</span>
+						      Open...
+						    </div>
+						    <div class="item">
+						      <span class="description">ctrl + s</span>
+						      Save as...
+						    </div>
+						    <div class="item">
+						      <span class="description">ctrl + r</span>
+						      Rename
+						    </div>
+						    <div class="item">Make a copy</div>
+						    <div class="item">
+						      <i class="folder icon"></i>
+						      Move to folder
+						    </div>
+						    <div class="item">
+						      <i class="trash icon"></i>
+						      Move to trash
+						    </div>
+						    <div class="divider"></div>
+						    <div class="item">Download As...</div>
+						    <div class="item">
+						      <i class="dropdown icon"></i>
+						      Publish To Web
+						      <div class="menu">
+						        <div class="item">Google Docs</div>
+						        <div class="item">Google Drive</div>
+						        <div class="item">Dropbox</div>
+						        <div class="item">Adobe Creative Cloud</div>
+						        <div class="item">Private FTP</div>
+						        <div class="item">Another Service...</div>
+						      </div>
+						    </div>
+						    <div class="item">E-mail Collaborators</div>
+						  </div>
+						</div>
+					  </div>
+				</div>
+				
+				<div id=dashCamContent>
+				
+				</div>
 	</div>
 	
+	<div id=keep style=position:fixed;overflow-y:scroll;left:10px;display:none;top:42px;width:100%;height:100%;background-color:white;z-index:5000 >
+				<div class="ui menu">
+					  <div class="item">
+					    <div id=keepPurgeButton class="ui olive button">Purge Oldest</div>
+					  </div>
+					  <div class="item">
+					    <div id=keepPurgeAllButton class="ui red button">Purge All Keeped files</div>
+					  </div>
+					  <div class="item">
+					    <div id=closeKeep class="ui button">Close</div>
+					  </div>
+				</div>
+				
+				<div id=keepContent>
+				
+				</div>
+	</div>
+		
 	<div id=dashai style=position:fixed;display:none;top:42px;width:100%;height:100%;background-color:white;z-index:5000 >
 	
 					<div class="ui menu">
@@ -1064,7 +1227,7 @@
 </div>
 
 
-<div id=disconnect class="ui basic modal">
+<div id=disconnect style=z-index:90000 class="ui basic modal">
   <div class="ui icon header">
     <i class="plug icon"></i>
     Lost Connection/Disconnected, please click when ok

@@ -117,6 +117,12 @@ public class TimeLine {
 
 	public FilesByHour extractByHour() {
 		FilesByHour aFilesByHour = new FilesByHour();
+		for (Camera aCamera:Core.getInstance().getUsers().get("admin").getCameras().values())
+		{
+			aFilesByHour.getCamMap().put(aCamera.getName(), aCamera.getFileByHour());
+		}
+		return aFilesByHour;
+		/*
 		if (new File(Core.getInstance().getKerberosioPath()).isDirectory()) {
 			for (File aFile : new File(Core.getInstance().getKerberosioPath()).listFiles()) {
 				if (aFile.isDirectory() && !aFile.getName().equalsIgnoreCase("pimpMyKerberos")) {
@@ -134,15 +140,15 @@ public class TimeLine {
 								if (mapCam.containsKey(aCalendar.getTimeInMillis())) {
 									count += mapCam.get(aCalendar.getTimeInMillis());
 								}
-								Fonctions.trace("DBG",
-										"Adding file count " + count + " to timeslot " + aCalendar.getTime()
-												+ " fileName is " + subFile.getName() + " file time "
-												+ new Date(subFile.lastModified()),
-										"TimeLine");
+//								Fonctions.trace("DBG",
+//										"Adding file count " + count + " to timeslot " + aCalendar.getTime()
+//												+ " fileName is " + subFile.getName() + " file time "
+//												+ new Date(subFile.lastModified()),
+//										"TimeLine");
 								mapCam.put(aCalendar.getTimeInMillis(), count);
-								aCalendar = Calendar.getInstance();
-								aCalendar.add(Calendar.HOUR_OF_DAY, 1);
-								mapCam.put(aCalendar.getTimeInMillis(), 0);
+//								aCalendar = Calendar.getInstance();
+//								aCalendar.add(Calendar.HOUR_OF_DAY, 1);
+//								mapCam.put(aCalendar.getTimeInMillis(), 0);
 							}
 
 						}
@@ -157,6 +163,7 @@ public class TimeLine {
 					"TimeLine");
 		}
 		return aFilesByHour;
+		*/
 	}
 
 }

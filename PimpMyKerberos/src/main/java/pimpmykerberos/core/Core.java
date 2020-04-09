@@ -129,6 +129,12 @@ public class Core {
 	Integer daysBeforePurge = 30;
 
 	/**
+	 * Default max keep day for files keeped 
+	 */
+	Integer daysBeforePurgeKeeped = 365;
+
+	
+	/**
 	 * Max column to display
 	 */
 	Integer maxDisplayColumnInGUI = 6;
@@ -722,6 +728,14 @@ public class Core {
 
 	public void setDeepLearning(Boolean deepLearning) {
 		this.deepLearning = deepLearning;
+	}
+
+	public Integer getDaysBeforePurgeKeeped() {
+		return daysBeforePurgeKeeped;
+	}
+
+	public void setDaysBeforePurgeKeeped(Integer daysBeforePurgeKeeped) {
+		this.daysBeforePurgeKeeped = daysBeforePurgeKeeped;
 	}
 
 }
