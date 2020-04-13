@@ -4,6 +4,8 @@
   <webServerIp>0.0.0.0</webServerIp>
   <webSocketPort>4430</webSocketPort>
   <debug>true</debug>
+  <deepLearning>true</deepLearning>
+  
   <timeBetweenScan>60000</timeBetweenScan>
   <debugJetty>false</debugJetty>
   <adminPassword>admin</adminPassword>
@@ -11,6 +13,7 @@
   <kerberosioPath>/kerberos</kerberosioPath>
   <maxDisplayLineInGUI>5</maxDisplayLineInGUI>
   <daysBeforePurge>30</daysBeforePurge>
+  <daysBeforePurgeKeeped>365</daysBeforePurgeKeeped>
   <maxDisplayColumnInGUI>6</maxDisplayColumnInGUI>
   <nightMode>1</nightMode>
   <muteMode>0</muteMode>

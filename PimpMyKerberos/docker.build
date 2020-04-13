@@ -1,5 +1,7 @@
-docker build --tag pimpmykerberos:1.0 .
+echo "Version (1.1): " 
+read VERSION
+docker build --tag pimpmykerberos:$VERSION .
 docker login
-docker tag pimpmykerberos:1.0 docker.io/coxifred/pimpmykerberos:1.0
-docker push coxifred/pimpmykerberos:1.0
+docker tag pimpmykerberos:$VERSION docker.io/coxifred/pimpmykerberos:$VERSION
+docker push coxifred/pimpmykerberos:$VERSION
 
