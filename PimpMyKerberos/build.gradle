@@ -26,6 +26,9 @@ dependencies {
     compile group: 'org.eclipse.jetty'          , name: 'jetty-webapp',                version: "${jettyVersion}"
     compile group: 'org.eclipse.jetty'          , name: 'jetty-servlet',               version: "${jettyVersion}"
     compile group: 'org.eclipse.jetty'          , name: 'jetty-util',                  version: "${jettyVersion}"
+    
+	compile group: 'org.eclipse.jetty'			, name: 'jetty-io', 				   version: "${jettyVersion}"
+    
     compile group: 'org.eclipse.jetty.websocket', name: 'javax-websocket-server-impl', version: "${jettyVersion}"
     compile group: 'org.eclipse.jetty.http2'	, name: 'http2-server', 	  	       version: "${jettyVersion}"
     compile group: 'org.influxdb'				, name: 'influxdb-java', 			   version: "2.17"
