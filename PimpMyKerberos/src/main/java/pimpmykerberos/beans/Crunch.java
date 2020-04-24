@@ -9,6 +9,7 @@ public class Crunch {
 	List<Map<Integer,Media>> cameraToMedia;
 	Integer maxLineDisplay=5;
 	Integer maxColumnDisplay=6;
+	Integer cameraAmount=1;
 	Long startCrunch=0l;
 	Long endCrunch=0l;
 	Long size=0l;
@@ -55,6 +56,12 @@ public class Crunch {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public Integer getCameraAmount() {
+		return cameraAmount;
+	}
+	public void setCameraAmount(Integer cameraAmount) {
+		this.cameraAmount = cameraAmount;
 	}
 	
 	

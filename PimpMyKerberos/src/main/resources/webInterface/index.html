@@ -11,7 +11,7 @@
 <link rel="stylesheet" type="text/css" href="css/login.css" />
 
 <script>
-
+	
 	function getUrlVars(cle)
 	{
 	    var vars = [], hash;
@@ -27,6 +27,24 @@
 	}
 	
 	$(document).ready(function() {
+		
+		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )
+			{
+			
+			$("#login").addClass('massive');
+			$("#userInput").addClass('massive');
+			$("#user").css("height","200px");$("#userInput").css("width","100%");$("#userInput").css("font-size","600%");
+			$("#passwd").css("height","200px");$("#passwdInput").css("width","100%");
+			$("#passwdInput").addClass('massive');$("#passwdInput").css("font-size","600%");
+			$("#loginForm").css("width","100%");$("#loginForm").css("top","100px");
+			$("#user").css("height","200px");$("#user").css("width","100%");
+			
+			$("#login").css("width","100%");
+			$("#login").css("height","200px");
+			$("#wolf").css("top","100px");
+			$("#login").css("font-size","600%");
+			}
+		
 		redirect=getUrlVars("redirect");
 		getValueFromUrl("admin?action=isLogged",true,function(isLogged){
 			if ( isLogged == "true" )
@@ -119,11 +137,11 @@
 
 <body class=background-color:"#943633">
 
-		<center><img style=position:relative;top:300px height=40% src=images/wolf.png><center>
+		<center><img id=wolf style=position:relative;top:300px height=40% src=images/wolf.png><center>
 	
-    	<div class=loginForm>
-	        <div><input class="textField noselect" type="text" id=user name="user" placeholder=" Username" required="required" /></div>
-	        <div><input class="textField noselect" type="password" id=passwd name="Passwd" placeholder=" Password" required="required" /></div>
+    	<div id=loginForm class=loginForm>
+	        <div id=userInput class="ui icon input"><input class="textField noselect" type="text" id=user name="user" placeholder=" Username" required="required" /><i class="user icon"></i></div><br>
+	        <div id=passwdInput class="ui icon input"><input class="textField noselect" type="password" id=passwd name="Passwd" placeholder=" Password" required="required" /><i class="key icon"></i></div>
 			
 			<button id=login class="ui primary button loginButton ">
   				Login

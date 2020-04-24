@@ -5,6 +5,7 @@ body {
  padding:0;
  -webkit-background-size: cover; /* pour anciens Chrome et Safari */
  background-size: cover; /* version standardis�e */
+ overscroll-behavior: contain;
 }
 
 body::-webkit-scrollbar {
@@ -31,14 +32,16 @@ a:active {
   color: white;
 }
 
+
 .noselect{
-	-webkit-touch-callout: text; /* iOS Safari */
-    -webkit-user-select: text; /* Safari */
-     -khtml-user-select: text; /* Konqueror HTML */
-       -moz-user-select: text; /* Old versions of Firefox */
-        -ms-user-select: text; /* Internet Explorer/Edge */
-            user-select: text; /* Non-prefixed version, currently*/
+	-webkit-touch-callout: text;
+    -webkit-user-select: text;
+     -khtml-user-select: text;
+       -moz-user-select: text;
+        -ms-user-select: text;
+            user-select: text;
 }
+
 
 .blink {
   animation: blinker 1s linear infinite;

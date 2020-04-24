@@ -16,7 +16,6 @@ import pimpmykerberos.core.Core;
 import pimpmykerberos.server.servlets.AdminServlet;
 import pimpmykerberos.server.servlets.CameraServlet;
 import pimpmykerberos.server.servlets.DisplayServlet;
-import pimpmykerberos.server.servlets.ProxyServlet;
 import pimpmykerberos.server.servlets.StreamServlet;
 import pimpmykerberos.server.websocket.JettyWebSocketServlet;
 import pimpmykerberos.utils.Fonctions;
@@ -111,7 +110,7 @@ public class JettyWebServer extends Thread {
 		context.addServlet(CameraServlet.class, "/camera/*");
 		context.addServlet(DisplayServlet.class, "/display/*");
 		context.addServlet(StreamServlet.class, "/stream/*");
-		context.addServlet(ProxyServlet.class, "/proxy/*");
+
 		context.addServlet(new ServletHolder(new JettyWebSocketServlet()), "/hello");
 		server.setHandler(context);
 	}

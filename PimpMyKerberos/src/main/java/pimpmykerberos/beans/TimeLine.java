@@ -48,6 +48,8 @@ public class TimeLine {
 		Crunch aCrunch = new Crunch();
 		aCrunch.setId(UUID.randomUUID().toString());
 		aCrunch.setMaxLineDisplay(Core.getInstance().getMaxDisplayLineInGUI());
+		User requester = Core.getInstance().getUsers().get("admin");
+		aCrunch.setCameraAmount(requester.getCameras().size());
 		aCrunch.setMaxColumnDisplay(Core.getInstance().getMaxDisplayColumnInGUI());
 		if (timeToMedia.size() > 0) {
 			if (timeToMedia.size() < Core.getInstance().getMaxDisplayLineInGUI()) {

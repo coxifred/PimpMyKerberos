@@ -185,9 +185,10 @@ public class AdminServlet extends AbstractServlet {
 		User requester = (User) request.getSession().getAttribute("USER");
 		if (requester != null) {
 			if (requester.getName().equals("admin")) {
-				File aDockerCompose = new File(Core.getInstance().getDockerCompose().getDockerComposeFile());
-				if (aDockerCompose != null && aDockerCompose.exists()) {
-					File upperFile = aDockerCompose.getParentFile();
+				
+				File aDataPath = new File(Core.getInstance().getDataPath());
+				if (aDataPath != null && aDataPath.exists()) {
+					File upperFile = aDataPath.getParentFile();
 					if (upperFile != null) {
 						Space aSpace = new Space();
 						aSpace.setFree(String.format("%.2f", Float.valueOf(upperFile.getFreeSpace() / 1024 / 1024)));
@@ -198,8 +199,13 @@ public class AdminServlet extends AbstractServlet {
 								upperFile.getTotalSpace() / 1024 / 1024 - upperFile.getFreeSpace() / 1024 / 1024)));
 						response.getWriter().write(toGson(aSpace));
 					}
+				}else
+				{
+					Fonctions.trace("WNG", "Unable to get size of " +  Core.getInstance().getDataPath(), "CORE");
+
 				}
 
+				
 			}
 		}
 		response.getWriter().write("");
