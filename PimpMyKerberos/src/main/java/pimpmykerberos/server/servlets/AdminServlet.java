@@ -186,7 +186,7 @@ public class AdminServlet extends AbstractServlet {
 		if (requester != null) {
 			if (requester.getName().equals("admin")) {
 				
-				File aDataPath = new File(Core.getInstance().getDataPath());
+				File aDataPath = new File(Core.getInstance().getKerberosioPath());
 				if (aDataPath != null && aDataPath.exists()) {
 					File upperFile = aDataPath.getParentFile();
 					if (upperFile != null) {
@@ -201,7 +201,7 @@ public class AdminServlet extends AbstractServlet {
 					}
 				}else
 				{
-					Fonctions.trace("WNG", "Unable to get size of " +  Core.getInstance().getDataPath(), "CORE");
+					Fonctions.trace("WNG", "Unable to get size of " +  Core.getInstance().getDataPath(), "AdminServlet");
 
 				}
 

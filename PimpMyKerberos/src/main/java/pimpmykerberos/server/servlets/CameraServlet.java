@@ -376,7 +376,13 @@ public class CameraServlet extends AbstractServlet {
 			if (requester.getName().equals("admin")) {
 				String startCrunch = request.getParameter("startCrunch");
 				String size = request.getParameter("size");
+				if ( Core.getInstance().getTimeline() != null )
+				{
 				response.getWriter().write(toGson(Core.getInstance().getTimeline().extract(startCrunch, size)));
+				}else
+				{
+					Fonctions.trace("ERR", "Couldn't read timeLine data", "CameraServlet");
+				}
 			}
 		}
 	}
