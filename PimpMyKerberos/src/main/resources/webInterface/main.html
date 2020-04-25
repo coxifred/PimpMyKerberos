@@ -172,6 +172,11 @@
 				overlay=1;
 			});
 			
+			$("#reloadAll").click(function(e){
+				top.location.href="/main.html";
+			});
+			
+			
 			$("#hideMessage").click(function(e){
 				$("#simpleMessage").hide();
 			});
@@ -1178,7 +1183,7 @@
 		
 	
 		<div id=time style=position:fixed;z-index:12000;top:15px;left:2px;color:white;background-color:white></div> 
-		
+		    <div id=reloadAll style=position:fixed;z-index:12000;top:5px;right:250px;height:38px  class="ui red button">Reload</div>
 			<div class="ui calendar" id="calendar">
   				<div  style=position:fixed;z-index:12000;top:5px;right:50px class="ui input left icon">
 	    			<i class="calendar icon"></i>

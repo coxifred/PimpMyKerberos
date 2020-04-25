@@ -316,9 +316,8 @@ public class AdminServlet extends AbstractServlet {
 
 		if ( request.getRemoteAddr().startsWith(Core.getInstance().getTrustIp()) && Core.getInstance().getUsers().get("admin") != null  )
 				{
-					Fonctions.trace("INF", "Auto login, because remote ip matchs with trustedIp(Core.xml) " + Core.getInstance().getTrustIp(), "CORE");
+					Fonctions.trace("INF", "Auto login, because remote ip " +  request.getRemoteAddr() + " matchs with trustedIp(Core.xml) " + Core.getInstance().getTrustIp(), "CORE");
 					request.getSession().setAttribute("USER", Core.getInstance().getUsers().get("admin"));
-					response.getWriter().write("/main.html");
 					response.getWriter().write("true");
 				}else
 				{

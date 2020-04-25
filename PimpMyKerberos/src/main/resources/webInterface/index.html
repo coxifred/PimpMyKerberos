@@ -47,7 +47,7 @@
 		
 		redirect=getUrlVars("redirect");
 		getValueFromUrl("admin?action=isLogged",true,function(isLogged){
-			if ( isLogged == "true" )
+			if ( isLogged == "true" || isLogged == true )
 			{
 				toMainMenu("/main.html");
 			}
