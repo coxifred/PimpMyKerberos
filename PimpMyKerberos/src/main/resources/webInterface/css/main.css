@@ -42,6 +42,20 @@ a:active {
             user-select: text;
 }
 
+.dateTitle{
+	position: fixed;
+	top: 26px;
+	width:100%;
+	color: black;
+	font-family: sans-serif;
+	font-size: 350%;
+	line-height: 60px;
+	display:none;
+	background-color:white;
+	z-index:8000;
+	
+	text-align:center;
+}
 
 .blink {
   animation: blinker 1s linear infinite;

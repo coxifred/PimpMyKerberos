@@ -41,7 +41,10 @@ $(document).ready(function() {
 	    				//document.location="waiting.html?redirect=" + actualLocation ;
     					}
 					
-    			}
+    			}else if ( actualLocation == "/index.html" )
+				{
+					document.location="/main.html";
+				}
 	    	});
 	    } 			    
 	});

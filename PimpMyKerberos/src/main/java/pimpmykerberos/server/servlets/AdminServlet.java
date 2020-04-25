@@ -314,11 +314,20 @@ public class AdminServlet extends AbstractServlet {
 
 	private void isLogged(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+		if ( request.getRemoteAddr().startsWith(Core.getInstance().getTrustIp()) && Core.getInstance().getUsers().get("admin") != null  )
+				{
+					Fonctions.trace("INF", "Auto login, because remote ip matchs with trustedIp(Core.xml) " + Core.getInstance().getTrustIp(), "CORE");
+					request.getSession().setAttribute("USER", Core.getInstance().getUsers().get("admin"));
+					response.getWriter().write("/main.html");
+					response.getWriter().write("true");
+				}else
+				{
 		if (request.getSession().getAttribute("USER") != null) {
 			response.getWriter().write("true");
 		} else {
 			response.getWriter().write("false");
 		}
+				}
 
 	}
 

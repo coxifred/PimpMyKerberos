@@ -2,6 +2,9 @@ package pimpmykerberos.server.servlets;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -259,15 +262,17 @@ public class CameraServlet extends AbstractServlet {
 				if (date != null) {
 					try {
 
-						Date aDate = Fonctions.getDateFormat(date + "_23:59:50", "yyyy-MM-dd_hh:mm:ss");
-						int time_offset;
+						Date aDate = Fonctions.getDateFormat(date + ":00", "yyyy-MM-dd_hh:mm:ss");
+						ZoneId zone = ZoneId.of(Core.getInstance().getTimeZone());
+						ZoneId utcZone = ZoneId.of("UTC");
+						LocalTime now = LocalTime.now(zone);
+						LocalTime utc = LocalTime.now(utcZone);
+						long hoursBetween = ChronoUnit.HOURS.between(now,utc);
 						Calendar cal = Calendar.getInstance();
-						time_offset = Calendar.DST_OFFSET - Calendar.ZONE_OFFSET;
 						cal.setTime(aDate);
-						cal.add(Calendar.HOUR, -time_offset);
-						cal.getTime();
-						Fonctions.trace("DBG", "Display from  " + cal.getTime(), "CameraServlet");
-						String startCrunch = Long.toString(cal.getTimeInMillis());
+						cal.add(Calendar.HOUR_OF_DAY, Long.valueOf(hoursBetween).intValue());
+						Fonctions.trace("DBG", "Display from " + aDate + " nowlocalTime " + now + " hoursBetween " + hoursBetween, "CameraServlet");
+						String startCrunch = Long.toString(cal.getTime().getTime());
 						String size = request.getParameter("size");
 						response.getWriter().write(toGson(Core.getInstance().getTimeline().extract(startCrunch, size)));
 					} catch (Exception e) {

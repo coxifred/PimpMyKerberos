@@ -6,6 +6,7 @@
 	   <link rel="stylesheet" type="text/css" href="css/main.css"/>
 	   <link rel="stylesheet" type="text/css" href="css/calendar.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
+		
 		<link rel="stylesheet" type="text/css" href="css/Chart.css"/>
  	   
 
@@ -24,6 +25,7 @@
 		var ctx="";
 		var lastScrollTop = 0;
 		var overlay=0;
+		var dateSelected;
 		
 		// Affichage peripheriques des videos, on chargera les x timeline au dessus et en dessous, les autres seront mises à src="" pour décharger la mémoire
 		var peripheralDisplay=3;
@@ -58,6 +60,7 @@
 			setInterval(displayTime, 1000);
 			setInterval(reloadSpace, 10000);
 			setInterval(garbageTimeCollector,10000);
+			setInterval(loadLiveCamera,300000);
 			
 			
 			setInterval(function(){ 
@@ -68,35 +71,51 @@
         																	$("#simpleMessage").hide();
 																			$("#camContent").hide();
 																			$("#cameraHeader").show();
+																			$('#dateTitle').hide();
       												 }
 				
-												$("#progressDetection").progress('increment',1);
+												
+											}
+											$("#progressDetection").progress('increment',1);
 						 						if($("#progressDetection").progress('is complete')) {
         																	$("#reloadMessage").hide();
 																			
       												 }
-											}
 										 }, 100);
 			
-			$("#calendar").datepicker(
+			
+	     
+			   
+			   $("#calendar").calendar(
 				{
-					onSelect: function(dateText) {
-								     			    console.log("Selected date: " + dateText + "; input's current value: " + this.value);
-													getValueFromUrl("camera?action=fromDay&date="+ dateText,true,function (json){
-																try {
-																	timeLineJson=JSON.parse(json);
-																	console.log("from picker " + timeLineJson);
-																	loadStoreCamera(true,"");	
-																	}
-																	catch (e)
-																	{
-																		console.log(e);
-																	}
-													});
-											    } 
-				}
-			);
-			$("#calendar").datepicker("option","dateFormat","yy-mm-dd");
+					    ampm: false,
+						onChange: function(date, text, mode) 	{
+																		dateSelected=date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()  + "_" + date.getHours() + ":" + date.getMinutes()
+													     			    //console.log("Selected date: " + myDate + " text " + text + " mode " + mode);
+																		
+																		
+																		
+											    				},
+						 onHidden: function () {
+													getValueFromUrl("camera?action=fromDay&date="+ dateSelected,true,function (json){
+																					try {
+																						timeLineJson=JSON.parse(json);
+																						//console.log("from picker " + timeLineJson);
+																						overlay=1;
+																						loadStoreCamera(true,"");	
+																						$("#camContent").show();
+																						$("#cameraHeader").hide();
+																						}
+																						catch (e)
+																						{
+																							console.log(e);
+																						}
+																		});
+    											}
+				});
+				
+				
+					
 			
 			$('#muteCheck').checkbox().checkbox({
 					    onChecked: function() {
@@ -153,6 +172,19 @@
 				overlay=1;
 			});
 			
+			$("#hideMessage").click(function(e){
+				$("#simpleMessage").hide();
+			});
+			
+			$("#gotTop").click(function(e){
+				$("#simpleMessage").hide();
+				timeLineJson="";
+				loadStoreCamera(true,"");
+				$("#camContent").hide();
+				$("#cameraHeader").show();
+				$('#dateTitle').hide();
+			});
+			
 			$("#liveButton").click(function(e){
 				$("#progressSimple").progress('progress',9);
 				overlay=0;
@@ -165,6 +197,9 @@
 			});
 			
 			
+			$("#closeDashCam").click(function(e){
+				$("#dashcam").hide();
+			});
 			
 			$("#closeDashAI").click(function(e){
 				$("#dashai").transition('fade down');
@@ -243,10 +278,10 @@
 								
 								 if ( keepJson[i].pathToMedia.endsWith(".mp4"))
 									{
-										html+= "<video class=\"" + keepJson[i].id + "\" muted style=border-radius:5px; width=150 controls src=\"/display?fileName=" + keepJson[i].pathToMedia + "\" >not loading</video>";
+										html+= "<video class=\"keeped " + keepJson[i].id + "\" muted style=border-radius:5px; width=150 controls src=\"/display?fileName=" + keepJson[i].pathToMedia + "\" >not loading</video>";
 									}else if (keepJson[i].pathToMedia.endsWith(".jpg"))
 									{
-										 html+= "<img class=\"" + keepJson[i].id + "\" forceDisplay width=150 id=\"" + keepJson[i].id + "\" src=\"/display?fileName=" + keepJson[i].pathToMedia + "\" />";										
+										 html+= "<img class=\"keeped " + keepJson[i].id + "\" forceDisplay width=150 id=\"" + keepJson[i].id + "\" src=\"/display?fileName=" + keepJson[i].pathToMedia + "\" />";										
 									}
 						html+="</div>";
 					}
@@ -535,7 +570,6 @@
 			
 			function setNightMode(aNightMode)
 			{
-				return;
 				nightMode=aNightMode;
 				if ( nightMode == 1 )
 				 {
@@ -547,12 +581,29 @@
 					$('#spaceBlock').css("background-color","black");
 					$('#spaceMemory').css("background-color","black");
 					$('#memoryColor').css("color","white");
+					$('#memoryColor').css("background-color","black");
+					$('#memoryBlock').css("background-color","black");
 					$('#spaceColor').css("color","white");
 					$("body").find(".dateEvt").css("color","white");
 					$("body").find(".loadMore").css("background-color","black");
 					$("body").find(".loadMore").css("color","white");
 					$('#time').css("color","white");
+					$('#time').css("background-color","black");
 					$('#showChartModal').css("background-color","black");
+					
+					$('#dashCamContent').css("background-color","black");
+					
+					
+					$('#keep').css("background-color","black");
+					$('#keepMenu').css("background-color","black");
+					$("body").find(".keeped").css("color","white");
+					
+					
+					$('#dashcam').css("background-color","black");
+					$('#dashCamMenuModal').css("background-color","black");
+					
+					$('#dateTitle').css("color","white");
+					$('#dateTitle').css("background-color","black");
 				}else
 				{					 
 				    $('body').css("background-color","white");
@@ -563,12 +614,28 @@
 					$('#spaceBlock').css("background-color","white");
 					$('#spaceMemory').css("background-color","white");
 					$('#memoryColor').css("color","black");
+					$('#memoryColor').css("background-color","white");
+					$('#memoryBlock').css("background-color","white");
 					$('#spaceColor').css("color","black");
 					$("body").find(".dateEvt").css("color","black");
 					$("body").find(".loadMore").css("background-color","white");
 					$("body").find(".loadMore").css("color","black");
 					$('#time').css("color","black");
+					$('#time').css("background-color","white");
 					$('#showChartModal').css("background-color","white");
+					
+					$('#keep').css("background-color","white");
+					$('#keepMenu').css("background-color","white");
+					$("body").find(".keeped").css("color","black");
+					
+					$('#dashcam').css("background-color","white");
+					$('#dashCamMenuModal').css("background-color","white");
+					
+					$('#dashCamContent').css("background-color","white");
+					
+					
+					$('#dateTitle').css("color","black");
+					$('#dateTitle').css("background-color","white");
 				}
 			}
 			
@@ -665,13 +732,14 @@
 			{
 				
 				    wDelta = e.wheelDelta < 0 ? 'down' : 'up';
-				    console.log(wDelta);
+				    console.log(wDelta + ' ' + $(window).scrollTop());
 					$("#simpleMessage").show();
 					$("#camContent").show();
 					$("#cameraHeader").hide();
 					$("#progressSimple").progress("reset");
 					
 					
+					$('#dateTitle').show();
 					
 
 					// Looking for the nearest element
@@ -803,6 +871,7 @@
 		function loadStoreCamera(redraw,crunch)
 		{
 			
+			
 			if ( timeLineJson != ""  )
 			{
 				if ( redraw )
@@ -828,8 +897,12 @@
 					$("body").find(".waitingPimp").hide();
 					
 					timeLineJson=JSON.parse(json);
-					console.log("timeLineJson");
+					
 					console.log(timeLineJson);
+					aDate=new Date(timeLineJson.startCrunch);
+					
+					$('#dateTitle').html(aDate.toLocaleDateString(undefined, options));
+					
 					html="<table style=width:100%>";
 					for ( i=0;i<timeLineJson.maxLineDisplay;i++)
 					{
@@ -847,7 +920,7 @@
 								 aDate=new Date(timeLine[k].time);
 								 html += "<div class=\"dateEvt " + k + "_" + timeLine[k].time + " \" ><center>" + aDate.toLocaleDateString(undefined, options) +  "</center></div>";
 						
-							 	 html+="<center><button style=position:relative;display:inline;width:33%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " trainable mini teal ui labeled icon button\"><i class=\"cog icon\"></i>Train</button>";
+							 	 html+="<center><button style=position:relative;display:inline;width:32%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " trainable mini teal ui labeled icon button\"><i class=\"cog icon\"></i>Train</button>";
 								 html+="<button style=position:relative;display:inline;width:33%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " purgeable mini red ui labeled icon button\"><i class=\"trash icon\"></i>Purge</button>";
 								 html+="<button style=position:relative;width:70px;display:inline;width:33%;float:left; name=\""  + k + "_" + timeLine[k].time + "\" id=\""  + timeLine[k].pathToMedia + "\" class=\"" + k + "_" + timeLine[k].time + " keepable mini green ui labeled icon button\"><i class=\"save icon\"></i>Keep</button></center>";
 								 if ( timeLine[k].pathToMedia.endsWith(".mp4"))
@@ -1015,7 +1088,7 @@
    	</head>
 	<body id=body class=noselect>
 	
-		<div id=memoryBlock class=memory style=position:fixed;top:0px;width:100%;z-index:8000;background-color:white>
+		<div id=memoryBlock class=memory style=position:fixed;top:0px;height:50px;width:100%;z-index:8000;background-color:white>
 		    <div id=memory style=width:100% class="ui tiny indicating progress">
 	  			<div style=z-index:8000 class="bar"></div>
 	  			<div id=memoryColor style="color:black;z-index:8000;background-color:white" class="label">Memory</div>
@@ -1034,13 +1107,13 @@
     	 </div>
 	
 	
-		<button id=menuDisplay style=position:fixed;z-index:5000;right:-4px;top:5px;height:37px class="big ui icon button">
-  			<i class="bars icon"></i>
+		<button id=menuDisplay style=position:fixed;z-index:50000;right:-4px;top:5px;height:37px class="big ui icon button">
+  			<i class="bars icon" style=position:relative;top:-4px></i>
 		</button>
 		
 		
 		
-		<div id=menu style=display:none;position:fixed;z-index:3000;right:-4px;top:43px; class="ui compact vertical labeled icon menu">
+		<div id=menu style=display:none;position:fixed;z-index:30000;right:-4px;top:43px; class="ui compact vertical labeled icon menu">
 			  <a class="item">
 			    <i id=setPath class="home icon"></i>
 			    Set kerberos.io path
@@ -1104,18 +1177,18 @@
 		
 		
 	
-		<div id=time style=position:fixed;z-index:10000;top:15px;left:2px;color:white;background-color:white></div> 
-		<div style=position:fixed;z-index:10000;top:5px;right:50px class="ui calendar" >
-			    <div class="ui input left icon">
-			      <i class="calendar icon"></i>
-			      	<input type="text" placeholder="Date" id="calendar">
-			    </div>
+		<div id=time style=position:fixed;z-index:12000;top:15px;left:2px;color:white;background-color:white></div> 
+		
+			<div class="ui calendar" id="calendar">
+  				<div  style=position:fixed;z-index:12000;top:5px;right:50px class="ui input left icon">
+	    			<i class="calendar icon"></i>
+	    			<input type="text" placeholder="Date/Time">
+  				</div>
 			</div>
-			
 
  			
 	<div id=frontal style=z-index:3000;>
-		<div id=cameraHeader style=position:fixed;z-index:1000;top:44px;width:100%>
+		<div id=cameraHeader style=position:fixed;z-index:11000;top:44px;width:100%>
 		
 		</div>
 		
@@ -1132,8 +1205,8 @@
 		</div>
 	</div>
 	
-	<div id=dashcam style=position:fixed;overflow-y:scroll;left:10px;display:none;top:42px;width:100%;height:100%;background-color:white;z-index:5000 >
-		<div class="ui menu">
+	<div id=dashcam style=position:fixed;overflow-y:scroll;left:0px;display:none;top:42px;width:100%;height:100%;z-index:12000 >
+		<div id=dashCamMenuModal class="ui menu">
 					  <div class="item">
 					    <div id=dashCleanButton class="ui olive button">Clean Dash</div>
 					  </div>
@@ -1150,47 +1223,33 @@
 					    <div id=closeDashCam class="ui button">Close</div>
 					  </div>
 					  <div class="item">
-						<div id=menuDash class="ui dropdown">
-						  <div class="text">File</div>
-						  <i class="dropdown icon"></i>
+						<div id=menuDash class="yellow ui dropdown">
+						  <div class="text"><div class="ui yellow button"><i class="plus icon"></i>Add..</div></div>
+						  <i class="yellow dropdown icon"></i>
 						  <div class="menu">
-						    <div class="item">New</div>
 						    <div class="item">
-						      <span class="description">ctrl + o</span>
-						      Open...
-						    </div>
-						    <div class="item">
-						      <span class="description">ctrl + s</span>
-						      Save as...
-						    </div>
-						    <div class="item">
-						      <span class="description">ctrl + r</span>
-						      Rename
-						    </div>
-						    <div class="item">Make a copy</div>
-						    <div class="item">
-						      <i class="folder icon"></i>
-						      Move to folder
-						    </div>
-						    <div class="item">
-						      <i class="trash icon"></i>
-						      Move to trash
-						    </div>
-						    <div class="divider"></div>
-						    <div class="item">Download As...</div>
-						    <div class="item">
-						      <i class="dropdown icon"></i>
-						      Publish To Web
-						      <div class="menu">
-						        <div class="item">Google Docs</div>
-						        <div class="item">Google Drive</div>
-						        <div class="item">Dropbox</div>
-						        <div class="item">Adobe Creative Cloud</div>
-						        <div class="item">Private FTP</div>
-						        <div class="item">Another Service...</div>
+						      <span class="description"></span>
+							  <i class="camera icon"></i>
+							  <i class="dropdown icon"></i>
+						      Camera...
+							  <div class="menu">
+							
+								<div id=cameraAddMenu>
+								        <div class="item">Camera 1</div>
+								        <div class="item">Camera 2</div>
+								        <div class="item">Camera 3</div>
+								        <div class="item">Camera 4</div>
+								        <div class="item">Camera 5</div>
+								        <div class="item">Camera 6</div>
+								</div>
 						      </div>
 						    </div>
-						    <div class="item">E-mail Collaborators</div>
+						    <div class="item">
+							  <i class="chart line icon"></i>
+						      <span class="description"></span>
+						      Chart  
+						    </div>
+						    
 						  </div>
 						</div>
 					  </div>
@@ -1201,8 +1260,8 @@
 				</div>
 	</div>
 	
-	<div id=keep style=position:fixed;overflow-y:scroll;left:10px;display:none;top:42px;width:100%;height:100%;background-color:white;z-index:5000 >
-				<div class="ui menu">
+	<div id=keep style=position:fixed;overflow-y:scroll;left:0px;display:none;top:42px;width:100%;height:100%;z-index:12000 >
+				<div id=keepMenu class="ui menu">
 					  <div class="item">
 					    <div id=keepPurgeButton class="ui olive button">Purge Oldest</div>
 					  </div>
@@ -1304,7 +1363,7 @@
 <div id=disconnect style=z-index:90000 class="ui basic modal">
   <div class="ui icon header">
     <i class="plug icon"></i>
-    Lost Connection/Disconnected, please click when ok
+    Lost Connection/Disconnected, please click for retry connection
   </div>
   <div class="content">
    		<center><img style=position:relative;top:200px height=40% src=images/wolf.png><center>
@@ -1319,13 +1378,13 @@
 </div>
 
 
-<div style=position:fixed;display:none;bottom:45px;right:5px;z-index:3000;width:400px;border-radius:5px; id=reloadMessage class="ui icon message">
+<div style=position:fixed;display:none;bottom:1px;right:1px;z-index:300001;width:570px;border-radius:5px; id=reloadMessage class="ui icon message">
   <i class="eye icon"></i>
   <div class="content">
     <div class="header">
-       <div style=width:200px class="ui indicating tiny progress" id="progressDetection">
+       <div style=width:468px class="ui indicating tiny progress" id="progressDetection">
 		  <div class="bar">
-		    
+		     <div class="label">Auto hide in 10 secs</div>
 		  </div>
 		  <div class="label"></div>
 		</div>
@@ -1338,23 +1397,25 @@
 </div>
 
 
-<div style=position:fixed;display:none;bottom:45px;right:5px;z-index:3000;width:300px;border-radius:5px; id=simpleMessage class="ui icon mini message">
+<div style=position:fixed;display:none;bottom:1px;right:1px;z-index:30000;width:570px;border-radius:5px; id=simpleMessage class="ui icon mini message">
   <i class="eye icon"></i>
   <div class="content">
     <div class="header">
-        <div style=width:200px class="ui indicating tiny progress" id="progressSimple">
+        <div style=width:468px class="ui indicating tiny progress" id="progressSimple">
 		  <div class="bar">
 		  </div>
 		  <div class="label">Returning to live view in 10 secs</div>
 		</div>
     </div>
-	<div id=stayButton class="mini ui labeled icon button"> <i class="pause circle icon"></i>Pause</div>
-	<div id=liveButton class="mini ui labeled icon button"> <i class="play circle icon"></i>Play</div>
+	<div id=stayButton class="mini ui labeled icon button"> <i class="pause circle icon"></i>Pause Chrono</div>
+	<div id=liveButton class="mini ui labeled icon button"> <i class="play circle icon"></i>Continue Chrono</div>
+	<div id=gotTop class="mini ui labeled icon button"> <i class="arrow circle up icon"></i>Go Top</div>
+	<div id=hideMessage class="mini ui labeled icon button"> <i class="eye slash circle icon"></i>Hide</div>
   </div>
 </div>
 
 
-
+<div class=dateTitle id=dateTitle></div>
 
 
 <div id=purgeCount class="tiny ui modal">
@@ -1367,11 +1428,12 @@
   </div>
 </div>
 
-<div id=showChartModal style=display:none;z-index:3000;width:100%;height:420px;top:0px;position:fixed; >
-  <div id=canvasContent style=height:600px;width:100% class="content">
+<div id=showChartModal style=display:none;z-index:12000;width:100%;height:420px;top:100px;position:fixed;opacity:0.9 >
+ <div id=hideChartModal style=position:absolute;top:0px;right:50px class="tiny yellow ui approve button">Hide Chart</div>
+  <div id=canvasContent style=top:100px;height:600px;width:100% class="content">
     <canvas id="myChart" width="800" height="170"></canvas>
   </div>
-  <div id=hideChartModal style=position:relative;top:-300px class="tiny teal ui approve button">Hide</div>
+ 
   
 </div>
 

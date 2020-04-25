@@ -50,6 +50,11 @@ public class Core {
 	 * Config File for Core
 	 */
 	String coreFile;
+	
+	/**
+	 * Timezone
+	 */
+	String timeZone="Europe/Paris";
 
 	/**
 	 * webserver port
@@ -65,6 +70,11 @@ public class Core {
 	 * Complete url access
 	 */
 	transient String urlAccess = "";
+	
+	/**
+	 * Trust ip stard, when match no passwd asked
+	 */
+	String trustIp = "$$$$";
 
 	/**
 	 * Ip for binding server
@@ -206,6 +216,7 @@ public class Core {
 		// Loading plugins
 		loadPlugin();
 
+		Fonctions.trace("INF", "Please wait until first analysis is done, webserver not available for this moment","CORE");
 		computeKerberosioPath(false);
 		/**
 		 * Starting webserver
@@ -262,6 +273,8 @@ public class Core {
 		Fonctions.trace("INF", "", "CORE");
 		Fonctions.trace("INF", "", "CORE");
 
+		
+		
 		if ( getDeepLearning())
 		{
 			DeepLearning.getInstance().startUI();
@@ -676,7 +689,7 @@ public class Core {
 		return muteMode;
 	}
 
-	transient String paypal = "https://paypal.me/FredericCOSTANT/2";
+	final String paypal = "https://paypal.me/FredericCOSTANT/2";
 
 	public void setMuteMode(Integer muteMode) {
 		this.muteMode = muteMode;
@@ -686,9 +699,6 @@ public class Core {
 		return paypal;
 	}
 
-	public void setPaypal(String paypal) {
-		this.paypal = paypal;
-	}
 
 	public String getInfluxDbUrl() {
 		return influxDbUrl;
@@ -736,6 +746,22 @@ public class Core {
 
 	public void setDaysBeforePurgeKeeped(Integer daysBeforePurgeKeeped) {
 		this.daysBeforePurgeKeeped = daysBeforePurgeKeeped;
+	}
+
+	public String getTrustIp() {
+		return trustIp;
+	}
+
+	public void setTrustIp(String trustIp) {
+		this.trustIp = trustIp;
+	}
+
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
 	}
 
 }
