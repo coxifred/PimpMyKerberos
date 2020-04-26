@@ -105,6 +105,8 @@ What **pimpMyKerberos** doesn't do:
     <webSocketPort>4430</webSocketPort>                  <!-- Port for websocket, not used, read only-->
     <webServerIp>0.0.0.0</webServerIp>                   <!-- Can be blank, ip for binding web server-->
     <debug>true</debug>                                  <!-- Debug mode true|false-->
+    <deepLearning>false</deepLearning>                   <!-- DeepLearning module true|false not yet finished, let false-->
+    <trustIp>192.168.2</trustIp>                        <!-- With this mask adress, no password if match <ip style> -->
     <timeBetweenScan>60000</timeBetweenScan>             <!-- Time (in ms) between 2 directory analysis -->
     <debugJetty>false</debugJetty>                       <!-- Debug mode for jetty true|false -->
     <adminPassword>admin</adminPassword>                 <!-- Password for admin -->
