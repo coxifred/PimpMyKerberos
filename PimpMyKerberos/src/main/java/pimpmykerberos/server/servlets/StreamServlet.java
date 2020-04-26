@@ -79,7 +79,6 @@ public class StreamServlet extends HttpServlet {
 					BufferedOutputStream bout = new BufferedOutputStream(out);
 					response.setContentType("multipart/x-mixed-replace; boundary=mjpegstream");
 					int ch = 0;
-					;
 					while ((ch = bin.read()) != -1) {
 						bout.write(ch);
 					}

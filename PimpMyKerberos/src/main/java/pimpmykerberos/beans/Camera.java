@@ -97,7 +97,7 @@ public class Camera {
 		this.broadcastPort = broadcastPort;
 	}
 
-	public Map<Long, String> getTimeToFile() {
+	public TreeMap<Long, String> getTimeToFile() {
 		return timeToFile;
 	}
 

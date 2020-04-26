@@ -61,6 +61,7 @@
 			setInterval(reloadSpace, 10000);
 			setInterval(garbageTimeCollector,10000);
 			setInterval(loadLiveCamera,300000);
+			setInterval(refresh,600000);
 			
 			
 			setInterval(function(){ 
@@ -173,8 +174,13 @@
 			});
 			
 			$("#reloadAll").click(function(e){
-				top.location.href="/main.html";
+				refresh();
 			});
+			
+			function refresh()
+			{
+				top.location.href="/main.html";
+			}
 			
 			
 			$("#hideMessage").click(function(e){
@@ -973,7 +979,7 @@
 					cameraJson=JSON.parse(json);
 					console.log(cameraJson);
 					html="<table style=width:100%><tr>";
-					
+					cameraMenu="";
 					for ( i=0;i<cameraJson.length;i++)
 					{
 						percent=parseInt(100 / cameraJson.length);
@@ -991,9 +997,16 @@
 							html+="<button style=width:32% class=\"tiny blue ui labeled icon button\"><i class=\"wrench icon\"></i><a target=new href=http://" + ip +":" + camera.kerberosPort + ">Tune</a></button>";
 							html+="<br><a target=new href=/stream?camName=" + camera.name  + "&url=http://" + ip +":" + camera.broadcastPort + " ><img alt=\"no stream available see logs\" id=\"img_" + camera.name + "\" style=border-radius:5px;z-index:1000;width:100% src=/stream?camName=" + camera.name +"&url=http://" + ip +":" + camera.broadcastPort+"/></a>"
 						html+="</td>";
+						cameraMenu+='<div class="item"><i class="dropdown icon"></i>';
+						cameraMenu+=camera.name;
+						cameraMenu+='<div class="menu">';
+						       cameraMenu+='<div class="item">Live view</div>';
+							   cameraMenu+='<div class="item">Last Video</div>';
+							   cameraMenu+='<div class="item">Last Picture</div>';
+						cameraMenu+='</div></div>';
 					}
 					$("#cameraHeader").html(html + "</tr></table>");
-					
+					$("#cameraAddMenu").html(cameraMenu);
 				} catch (e)
 				{
 					console.log(e);
