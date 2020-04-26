@@ -23,4 +23,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./PimpMyKerberos/gradlew
     - name: Build with Gradle
-      run: ./PimpMyKerberos/gradlew fatjar
+      run: ./PimpMyKerberos/gradlew fatJar
