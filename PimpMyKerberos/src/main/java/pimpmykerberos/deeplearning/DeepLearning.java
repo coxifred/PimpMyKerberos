@@ -52,7 +52,7 @@ public class DeepLearning {
 //	                .build();
 //	        MultiLayerNetwork network = new MultiLayerNetwork(conf);
 //		
-//	    //Initialize the user interface_è backend
+//	    //Initialize the user interface backend
 //	    UIServer uiServer = UIServer.getInstance();
 //	   
 //	    //Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
