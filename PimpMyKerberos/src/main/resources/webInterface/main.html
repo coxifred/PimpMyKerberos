@@ -26,6 +26,7 @@
 		var lastScrollTop = 0;
 		var overlay=0;
 		var dateSelected;
+		var rollAuthorized=1;
 		
 		// Affichage peripheriques des videos, on chargera les x timeline au dessus et en dessous, les autres seront mises à src="" pour décharger la mémoire
 		var peripheralDisplay=3;
@@ -210,6 +211,7 @@
 			
 			$("#closeDashCam").click(function(e){
 				$("#dashcam").hide();
+				rollAuthorized=1;
 			});
 			
 			$("#closeDashAI").click(function(e){
@@ -251,6 +253,7 @@
 			});
 			
 			$("#dash").click(function(e){
+				rollAuthorized=0;
 				$("#dashcam").show();
 			});
 			
@@ -522,6 +525,55 @@
 				});
 			});
 			
+			
+			$("body").delegate(".liveable", "click", function(){
+				camera=JSON.parse(unescape($(this).attr("data_camera")));
+				$("#dashCamContent").append(createLive(camera) );
+				$("#topButtonDash").html('<div class="ui yellow button"><i class="plus icon"></i>Add..</div>');
+				$("#" + camera.name + "_drag").draggable();
+				$("#" + camera.name + "_drag").resizable( {aspectRatio : false});
+			});
+			
+			function createLive(camera)
+			{
+				return '<div style=height:300px;width:400px id="' + camera.name+ '_drag" ><div style=position:relative><img alt="no stream available see logs" id="img_"' + camera.name + '" style=border-radius:5px;z-index:1000;width:100% src=/stream?camName="' + camera.name +'"&url=http://"' + ip +'":"' + camera.broadcastPort+'"/></div></div>';
+				
+			}
+			
+			$("body").delegate(".rotateable", "click", function(e){
+				var id=this.id;
+				console.log("rotate");
+				rotateWidget(id,2);
+		
+			});
+	
+			$("body").delegate(".rotateableAnti", "click", function(e){
+				var id=this.id;
+				console.log("rotate");
+				rotateWidget(id,-2);
+			});
+	
+	
+			function rotateWidget(id,angle)
+			{
+				var currentRotate=parseInt(getRotationDegrees($("#widget_" + id)));
+				var currentZoom=parseFloat($("#widget_" + id).css("zoom"));
+				currentRotate+=angle;
+				//alert("#widget_" + id + " currentRotate=" + currentRotate);
+				var currentZoom=parseFloat($("#widget_" + id).css("zoom"));
+				rotate($("#widget_" + id),currentRotate,currentZoom);
+				getValueFromUrl("DomoticObjectAction?method=setWidgetZoomAndRotate&domoticId="+id+"&zoom=" +currentZoom + "&rotate=" + currentRotate,true);
+			}
+	
+	
+			$("body").delegate(".adrag", "mouseover", function(){
+				id=$(this).attr("id");
+				$(this).draggable();
+				
+			});
+			
+			
+			
 			$("body").delegate(".purgeable", "click", function(){
 				button=$(this);
 				button.addClass("loading");
@@ -669,9 +721,7 @@
 													
 													$("#labelPurge").html("Purge files > " + core.daysBeforePurge + "d");
 													$("#keepPurgeButton").html("Purge files > " + core.daysBeforePurgeKeeped + "d");
-													$("#menuDash").dropdown({
-																    clearable: true
-													})
+													$("#menuDash").dropdown();
 													loadLiveCamera();
 													
 													
@@ -741,9 +791,10 @@
 					
 			function roll(e)
 			{
-				
+				if ( rollAuthorized == 1 )
+				{
 				    wDelta = e.wheelDelta < 0 ? 'down' : 'up';
-				    console.log(wDelta + ' ' + $(window).scrollTop());
+				    //console.log(wDelta + ' ' + $(window).scrollTop());
 					$("#simpleMessage").show();
 					$("#camContent").show();
 					$("#cameraHeader").hide();
@@ -768,14 +819,14 @@
 						 }
 					});
 					
-					console.log("Nearest is " + nearest );
+					//console.log("Nearest is " + nearest );
 					loadNearest(nearest);
 					
 					if ( ($(".loadMore").last().offset().top - 1000)  < $(window).scrollTop())
 					{
 							
 								
-								console.log("Complete Reload and timeLineId " + timeLineId);
+								//console.log("Complete Reload and timeLineId " + timeLineId);
 								loadStoreCamera(false,"");
 								/*
 								var previous=timeLineId - 1;
@@ -788,7 +839,7 @@
 						
 						//$(".loadMore").last().remove();
 					
-					
+				}	
 			}
 			
 				function loadNearest(nearest)
@@ -1000,7 +1051,10 @@
 						cameraMenu+='<div class="item"><i class="dropdown icon"></i>';
 						cameraMenu+=camera.name;
 						cameraMenu+='<div class="menu">';
-						       cameraMenu+='<div class="item">Live view</div>';
+						       console.log(camera);
+						       console.log("After stringify");
+							   console.log(JSON.stringify(camera));	
+						       cameraMenu+='<div data_camera="' + escape(JSON.stringify(camera)) +'" class="liveable item">Live view</div>';
 							   cameraMenu+='<div class="item">Last Video</div>';
 							   cameraMenu+='<div class="item">Last Picture</div>';
 						cameraMenu+='</div></div>';
@@ -1240,9 +1294,10 @@
 					  <div class="item">
 					    <div id=closeDashCam class="ui button">Close</div>
 					  </div>
+			
 					  <div class="item">
 						<div id=menuDash class="yellow ui dropdown">
-						  <div class="text"><div class="ui yellow button"><i class="plus icon"></i>Add..</div></div>
+						  <div id=topButtonDash class="text"><div class="ui yellow button"><i class="plus icon"></i>Add..</div></div>
 						  <i class="yellow dropdown icon"></i>
 						  <div class="menu">
 						    <div class="item">
@@ -1253,12 +1308,7 @@
 							  <div class="menu">
 							
 								<div id=cameraAddMenu>
-								        <div class="item">Camera 1</div>
-								        <div class="item">Camera 2</div>
-								        <div class="item">Camera 3</div>
-								        <div class="item">Camera 4</div>
-								        <div class="item">Camera 5</div>
-								        <div class="item">Camera 6</div>
+							
 								</div>
 						      </div>
 						    </div>
@@ -1273,9 +1323,10 @@
 					  </div>
 				</div>
 				
-				<div id=dashCamContent>
-				
-				</div>
+		<div id=dashCamContent>
+		
+		</div>
+			
 	</div>
 	
 	<div id=keep style=position:fixed;overflow-y:scroll;left:0px;display:none;top:42px;width:100%;height:100%;z-index:12000 >

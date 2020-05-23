@@ -59,6 +59,7 @@ new function() {
 				//document.getElementById("messageImage").src = "/display?fileName=" + jsonMessage.imagePath;
 				document.getElementById("messageDetail").innerHTML = jsonMessage.message;
 				
+				
 			}else
 			{
  			 console.log("MESSAGE not implemented  " + jsonMessage.action);
