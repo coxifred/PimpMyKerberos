@@ -6,6 +6,7 @@ public class Service {
 	String image;
 	String container_name;
 	String network_mode;
+	String privileged;
 	String restart;
 	List<String> ports;
 	List<String> volumes;
@@ -44,6 +45,12 @@ public class Service {
 	}
 	public void setNetwork_mode(String network_mode) {
 		this.network_mode = network_mode;
+	}
+	public String getPrivileged() {
+		return privileged;
+	}
+	public void setPrivileged(String privileged) {
+		this.privileged = privileged;
 	}
 	
 	
