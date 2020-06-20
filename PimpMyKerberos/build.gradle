@@ -51,6 +51,8 @@ dependencies {
         compile group: 'org.deeplearning4j',             name: 'deeplearning4j-ui',                version: '1.0.0-beta6'
         compile group: 'org.nd4j',                   name: 'nd4j-native-platform',         version : '1.0.0-beta6'
 */
+	// https://mvnrepository.com/artifact/batik/batik-awt-util
+	compile group: 'batik', name: 'batik-awt-util', version: '1.6-1'
 	
 	
 
