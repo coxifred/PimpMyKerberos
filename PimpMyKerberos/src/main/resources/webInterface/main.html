@@ -7,6 +7,7 @@
 	   <link rel="stylesheet" type="text/css" href="css/calendar.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
 		
+		
 		<link rel="stylesheet" type="text/css" href="css/Chart.css"/>
  	   
 
@@ -27,10 +28,19 @@
 		var overlay=0;
 		var dateSelected;
 		var rollAuthorized=1;
-		
+		var makeEditable;
 		// Affichage peripheriques des videos, on chargera les x timeline au dessus et en dessous, les autres seront mises à src="" pour décharger la mémoire
 		var peripheralDisplay=3;
-
+		var timeBeforeReload=1800;
+		var resize=0;		
+		var dashItem="";
+		var currentX=0;
+		var currentY=0;
+		var perspectiveMode=0;
+		var perspectiveX=0;
+		var perspectiveY=0;
+		var degreX=0;
+		var degreY=0;
 			
 		var dynamicColors = function () {
  				   var r = Math.floor(Math.random() * 255);
@@ -47,6 +57,9 @@
 			    document.getElementById("wait_" + id).style.display="none";
 			}
 		
+			function loadImage(image) {
+				makeEditable(image);
+			}
 		
 		$(document).ready(function() {
 		
@@ -56,13 +69,13 @@
 			WebSocketClient.open(url("hello")); 
 			reloadMemory();reloadSpace();setNightMode(nightMode);
 			loadStoreCamera(true,"");
-		
+			loadDashBoard();
 			setInterval(reloadMemory, 10000);
 			setInterval(displayTime, 1000);
 			setInterval(reloadSpace, 10000);
 			setInterval(garbageTimeCollector,10000);
 			setInterval(loadLiveCamera,300000);
-			setInterval(refresh,600000);
+			
 			
 			
 			setInterval(function(){ 
@@ -130,6 +143,24 @@
 												}
 									});
     
+			$('#darkModeCheck').checkbox().checkbox({
+					    onChecked: function() {
+						 						
+							 					$("#dashCamContent").css("background-color","black");     				
+											  },
+					    onUnchecked: function() {
+											    $("#dashCamContent").css("background-color","white");
+												}
+									});
+			$('#homePageCheck').checkbox().checkbox({
+					    onChecked: function() {
+							      				
+											  },
+					    onUnchecked: function() {
+											    
+												}
+									});
+
 			
 			$('#nightCheck').checkbox().checkbox({
 					    onChecked: function() {
@@ -168,7 +199,23 @@
 							});
 								    
 		    });
-		
+
+
+			
+			$("#dashSaveButton").click(function(e){
+				
+				dashBoard={
+							color:$("#dashCamContent").css("background-color"),
+							content:$("#dashCamContent").html()
+				}
+				getValueFromActionPost("admin?action=saveDash",true,dashBoard);
+			});
+			
+			$("#dashCleanButton").click(function(e){
+				$("#dashCamContent").html("");
+			});
+			
+			
 			$("#stayButton").click(function(e){
 				$("#progressSimple").progress('progress',0);
 				overlay=1;
@@ -178,9 +225,25 @@
 				refresh();
 			});
 			
+			function loadDashBoard()
+			{
+				
+				getValueFromUrl("admin?action=getDash",true,function(json){
+						try {
+							    console.log(json);
+								dash=JSON.parse(json);
+								$("#dashCamContent").html(dash.content);
+								
+							} catch(e)
+							{
+								console.log(e);
+							}					
+					});
+			}
+			
 			function refresh()
 			{
-				top.location.href="/main.html";
+				top.location.href="/";
 			}
 			
 			
@@ -526,51 +589,109 @@
 			});
 			
 			
+			$("body").delegate(".resizable", "mousedown", function(event){
+				dashItem=$(this).attr("name");
+				currentX=event.pageX;
+				currentY=event.pageY;
+				$("#" + dashItem + "_drag").draggable( "destroy" )
+				resize=1;
+				
+			});
+			
+			$("body").delegate(".perspectiveZ", "mousedown", function(event){
+				dashItem=$(this).attr("name");
+				currentX=event.pageX;
+				currentY=event.pageY;
+				$("#" + dashItem + "_drag").draggable( "destroy" )
+				perspectiveMode="AxisZ";
+				
+			});
+			
+			
+			$("body").delegate(".perspectiveX", "mousedown", function(event){
+				dashItem=$(this).attr("name");
+				currentX=event.pageX;
+				currentY=event.pageY;
+				$("#" + dashItem + "_drag").draggable( "destroy" )
+				perspectiveMode="AxisX";
+				
+			});
+			
+			
+			$("body").mouseup(function (){
+				resize=0;perspectiveZ=0;perspectiveY=0;degreX=0;degreY=0;perspectiveMode=0;
+				$("#" + dashItem + "_drag").draggable({ disabled: false });
+				dashItem="";
+			});
+
+			$( "body" ).mousemove(function( event ) {
+			  if ( resize == 1 && dashItem != "" )
+				{	
+					distanceX=event.pageX- currentX ;
+					distanceY= event.pageY - currentY;
+					//console.log("distanceX=" + distanceX + " distanceY="  +distanceY + " " + event.pageX + ", " + event.pageY);
+					img_x=parseInt($("#dashimg_" + dashItem).css("width").replace('px','')) + (distanceX * 2);
+					img_y=parseInt($("#dashimg_" + dashItem).css("height").replace('px','')) + (distanceY* 2);
+					//console.log("distanceX=" + distanceX + " distanceY="  +distanceY + " " + event.pageX + ", " + event.pageY + " img_x=" +img_x+ " img_y=" +img_y);
+					$("#dashimg_" + dashItem).css("width",img_x +"px");
+					$("#dashimg_" + dashItem).css("height",img_y +"px");
+					$("#" + dashItem + "_drag").css("width",img_x +"px");
+					$("#" + dashItem + "_drag").css("height",img_y +"px");
+					currentX=event.pageX;
+					currentY=event.pageY;
+				}else if ( perspectiveMode == "AxisZ" && dashItem != "" )
+				{
+					console.log("AxisZ");
+					perspectiveX++;
+					degreY++;
+					$("#dashimg_" + dashItem).css("transform","perspective(" + perspectiveX + "px) translate3d(0px,-50px,0px) rotateY(" + degreY + "deg)");
+				}
+				else if ( perspectiveMode == "AxisX" && dashItem != "" )
+				{
+					perspectiveX++;
+					console.log("AxisZ");
+					degreY++;
+					$("#dashimg_" + dashItem).css("transform","perspective(" + perspectiveX + "px) translate3d(0px,-50px,0px) rotateX(" + degreY + "deg)");
+				}
+			  
+			});
+			
 			$("body").delegate(".liveable", "click", function(){
 				camera=JSON.parse(unescape($(this).attr("data_camera")));
-				$("#dashCamContent").append(createLive(camera) );
+				randomId=getRandomInt(65535);
+				$("#dashCamContent").append(createLive(camera,randomId) );
 				$("#topButtonDash").html('<div class="ui yellow button"><i class="plus icon"></i>Add..</div>');
-				$("#" + camera.name + "_drag").draggable();
-				$("#" + camera.name + "_drag").resizable( {aspectRatio : false});
+				
 			});
 			
-			function createLive(camera)
+			function createLive(camera,randomId)
 			{
-				return '<div style=height:300px;width:400px id="' + camera.name+ '_drag" ><div style=position:relative><img alt="no stream available see logs" id="img_"' + camera.name + '" style=border-radius:5px;z-index:1000;width:100% src=/stream?camName="' + camera.name +'"&url=http://"' + ip +'":"' + camera.broadcastPort+'"/></div></div>';
+				return '<div id="' + randomId + "_" + camera.name+ '_loader" class="ui segment"><p></p><div class="ui active dimmer"><div class="ui loader"></div></div></div>  <div  id="' + randomId + "_" + camera.name+ '_drag" ><div style=position:relative><img class=tunable onload=javascript:loadImage(\''+ randomId + "_" + camera.name + '\'); alt="no stream available see logs" id="dashimg_' + randomId + "_" + camera.name + '" style=border-radius:5px;z-index:1000 src=/stream?camName=' + camera.name +'&url=http://' + ip +':' + camera.broadcastPort+'/></div><i name="' + randomId + "_" + camera.name+ '_drag" class="trash icon dashTrashable"></i><i name="' + randomId + "_" + camera.name+ '" class="crop icon resizable"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate horizontal icon perspectiveZ"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate vertical icon perspectiveX"></i></div>';
 				
 			}
 			
-			$("body").delegate(".rotateable", "click", function(e){
-				var id=this.id;
-				console.log("rotate");
-				rotateWidget(id,2);
+			makeEditable=function (ident)
+			{
+				
+				$("#" + ident + "_loader").remove();
+				$("#" + ident + "_drag").draggable();
+				$("#" + ident + "_drag").rotatable( {  step: 1});
+			}
 		
+			
+			
+			$("body").delegate(".dashTrashable", "click", function(e){
+				var name=$(this).attr("name");
+				$("#" + name).remove();
 			});
 	
-			$("body").delegate(".rotateableAnti", "click", function(e){
-				var id=this.id;
-				console.log("rotate");
-				rotateWidget(id,-2);
-			});
 	
 	
-			function rotateWidget(id,angle)
-			{
-				var currentRotate=parseInt(getRotationDegrees($("#widget_" + id)));
-				var currentZoom=parseFloat($("#widget_" + id).css("zoom"));
-				currentRotate+=angle;
-				//alert("#widget_" + id + " currentRotate=" + currentRotate);
-				var currentZoom=parseFloat($("#widget_" + id).css("zoom"));
-				rotate($("#widget_" + id),currentRotate,currentZoom);
-				getValueFromUrl("DomoticObjectAction?method=setWidgetZoomAndRotate&domoticId="+id+"&zoom=" +currentZoom + "&rotate=" + currentRotate,true);
-			}
+	
+			
 	
 	
-			$("body").delegate(".adrag", "mouseover", function(){
-				id=$(this).attr("id");
-				$(this).draggable();
-				
-			});
+			
 			
 			
 			
@@ -626,9 +747,21 @@
 				});
 			});
 			
+			function getRandomInt(max) {
+  				return Math.floor(Math.random() * Math.floor(max));
+			}
+			
 			function displayTime()
 			{
 				$("#time").html(new Date().toLocaleDateString(undefined, options) );
+				timeBeforeReload-=1;
+				if ( timeBeforeReload <= 0)
+				{
+					refresh();
+				}else
+				{
+				    $("#reloadText").html("Reload Page(" + timeBeforeReload + "s)");
+				}
 			}
 			
 			function setNightMode(aNightMode)
@@ -1028,7 +1161,7 @@
 													
 				try {
 					cameraJson=JSON.parse(json);
-					console.log(cameraJson);
+					//console.log(cameraJson);
 					html="<table style=width:100%><tr>";
 					cameraMenu="";
 					for ( i=0;i<cameraJson.length;i++)
@@ -1051,9 +1184,6 @@
 						cameraMenu+='<div class="item"><i class="dropdown icon"></i>';
 						cameraMenu+=camera.name;
 						cameraMenu+='<div class="menu">';
-						       console.log(camera);
-						       console.log("After stringify");
-							   console.log(JSON.stringify(camera));	
 						       cameraMenu+='<div data_camera="' + escape(JSON.stringify(camera)) +'" class="liveable item">Live view</div>';
 							   cameraMenu+='<div class="item">Last Video</div>';
 							   cameraMenu+='<div class="item">Last Picture</div>';
@@ -1168,9 +1298,9 @@
 		</div>
 		
 		<div id=spaceBlock class=memory style=position:fixed;bottom:1px;height:40px;width:100%;z-index:8000;background-color:white>
-		    <div id=space style=width:100% class="ui tiny indicating progress">
+		    <div id=space style=width:100%;bottom:-30px class="ui tiny indicating progress">
 	  			<div class="bar"></div>
-	  			<div id=spaceColor style="color:black;" class="label">Space</div>
+	  			<div id=spaceColor style="position:relative;bottom:25px;color:black;" class="label">Space</div>
 			</div>
 		</div>
 	
@@ -1250,7 +1380,7 @@
 		
 	
 		<div id=time style=position:fixed;z-index:12000;top:15px;left:2px;color:white;background-color:white></div> 
-		    <div id=reloadAll style=position:fixed;z-index:12000;top:5px;right:250px;height:38px  class="ui red button">Reload</div>
+		    <div id=reloadAll style=position:fixed;z-index:12000;top:5px;right:250px;height:38px  class="ui red button"><div id=reloadText>Reload</div></div>
 			<div class="ui calendar" id="calendar">
   				<div  style=position:fixed;z-index:12000;top:5px;right:50px class="ui input left icon">
 	    			<i class="calendar icon"></i>
@@ -1286,14 +1416,18 @@
 					    <div id=dashSaveButton class="ui red button">Save Dash</div>
 					  </div>
 					  <div class="item">
-					    <div id=dashSetDefaultButton class="ui pink button">Set as default page</div>
+					    <div id=homePageCheck class="ui toggle checkbox">
+  							<input   type="checkbox" name="public">
+  								<label>Home page</label>
+						</div>
 					  </div>
 					  <div class="item">
-					    <div id=dashRemoveDefaultButton class="ui blue button">Remove from default page</div>
+					    <div  id=darkModeCheck class="ui toggle checkbox">
+  							<input type="checkbox" name="public">
+  								<label>Dark mode</label>
+						</div>
 					  </div>
-					  <div class="item">
-					    <div id=closeDashCam class="ui button">Close</div>
-					  </div>
+					
 			
 					  <div class="item">
 						<div id=menuDash class="yellow ui dropdown">
@@ -1312,14 +1446,14 @@
 								</div>
 						      </div>
 						    </div>
-						    <div class="item">
-							  <i class="chart line icon"></i>
-						      <span class="description"></span>
-						      Chart  
-						    </div>
+						   
 						    
 						  </div>
 						</div>
+					  </div>
+			
+			  		  <div class="item">
+					    <div id=closeDashCam class="ui button">Close</div>
 					  </div>
 				</div>
 				
@@ -1429,7 +1563,7 @@
 </div>
 
 
-<div id=disconnect style=z-index:90000 class="ui basic modal">
+<div id=disconnect style=z-index:190000 class="ui basic modal">
   <div class="ui icon header">
     <i class="plug icon"></i>
     Lost Connection/Disconnected, please click for retry connection

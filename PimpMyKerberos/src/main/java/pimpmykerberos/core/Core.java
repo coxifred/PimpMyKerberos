@@ -20,10 +20,12 @@ import java.util.Vector;
 import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.representer.Representer;
 
 import com.thoughtworks.xstream.XStream;
 
 import pimpmykerberos.beans.Camera;
+import pimpmykerberos.beans.Dashboard;
 import pimpmykerberos.beans.Log;
 import pimpmykerberos.beans.TimeLine;
 import pimpmykerberos.beans.User;
@@ -200,6 +202,10 @@ public class Core {
 	String influxDbUser="root";
 	String influxDbPasswd="root";
 	
+	/**
+	 * Dashboard
+	 */
+	Dashboard dashBoard=new Dashboard();
 
 	public void launch() throws Exception {
 
@@ -503,7 +509,9 @@ public class Core {
 
 		if (aDockerComposeFile.exists()) {
 			Fonctions.trace("DBG", "docker-compose.yml file exists " + aDockerComposeFile.getAbsolutePath(), "CORE");
-			Yaml yaml = new Yaml(new Constructor(DockerCompose.class));
+			Representer representer = new Representer();
+			representer.getPropertyUtils().setSkipMissingProperties(true);
+			Yaml yaml = new Yaml(new Constructor(DockerCompose.class),representer);
 
 			try {
 				dockerCompose = yaml.load(new FileInputStream(aDockerComposeFile));
@@ -520,7 +528,8 @@ public class Core {
 		if ( ! new File(getKerberosioPath()).isDirectory()) {
 			Fonctions.trace("ERR", "Path " + getKerberosioPath() + " doesn't exist anymore", "CORE");
 		} else {
-
+			try
+			{
 			for (File aFile : new File(getKerberosioPath()).listFiles()) {
 				if (aFile.isDirectory() && ! aFile.getName().equals("pimpMyKerberos")) {
 					Fonctions.trace("DBG", "Found a camera " + aFile.getName(), "CORE");
@@ -587,6 +596,10 @@ public class Core {
 			TimeLine aTimeLine = new TimeLine();
 			aTimeLine.populate();
 			Core.getInstance().setTimeline(aTimeLine);
+			}catch (Exception e)
+			{
+				Fonctions.trace("ERR", "Something bad when analysing " + getKerberosioPath() + " Sometimes (in docker mode), can be a rights access issue inside the container, please check", "CORE");
+			}
 		}
 	}
 
@@ -762,6 +775,14 @@ public class Core {
 
 	public void setTimeZone(String timeZone) {
 		this.timeZone = timeZone;
+	}
+
+	public Dashboard getDashBoard() {
+		return dashBoard;
+	}
+
+	public void setDashBoard(Dashboard dashBoard) {
+		this.dashBoard = dashBoard;
 	}
 
 }

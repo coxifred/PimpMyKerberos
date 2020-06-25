@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import pimpmykerberos.beans.Dashboard;
 import pimpmykerberos.beans.Log;
 import pimpmykerberos.beans.Memory;
 import pimpmykerberos.beans.Space;
@@ -93,6 +94,12 @@ public class AdminServlet extends AbstractServlet {
 			case "getWebSocketPort":
 				getWebSocketPort(request, response);
 				break;
+			case "saveDash":
+				saveDash(request, response);
+				break;
+			case "getDash":
+				getDash(request, response);
+				break;
 			}
 
 		}
@@ -103,6 +110,36 @@ public class AdminServlet extends AbstractServlet {
 		if (requester != null) {
 			if (requester.getName().equals("admin")) {
 				response.getWriter().write(toGson(Core.getInstance()));
+			}
+		}
+		
+	}
+	
+	private void saveDash(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				Dashboard aDashBoard=new Dashboard();
+				aDashBoard.setBackgroundColor(request.getParameter("backgroundColor"));
+				aDashBoard.setHomePage(Boolean.parseBoolean(request.getParameter("homePage")));
+				aDashBoard.setContent(request.getParameter("data[content]"));
+				Fonctions.trace("DBG", "Saving dashBoard " + toGson(aDashBoard), "AdminServlet");
+				Core.getInstance().setDashBoard(aDashBoard);
+			}
+		}
+		
+	}
+	
+	private void getDash(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		User requester = (User) request.getSession().getAttribute("USER");
+		if (requester != null) {
+			if (requester.getName().equals("admin")) {
+				if ( Core.getInstance().getDashBoard() != null)
+				{
+					
+					response.getWriter().write(toGson(Core.getInstance().getDashBoard()));
+					
+				}
 			}
 		}
 		

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
@@ -19,7 +18,7 @@ public class Camera {
 	String capturePath;
 	String ip;
 	Integer kerberosPort;
-	Integer daysBeforePurge=30;
+	Integer daysBeforePurge = 30;
 	Integer broadcastPort;
 	Date freshDate;
 	transient TreeMap<Long, String> timeToFile = new TreeMap<Long, String>();
@@ -33,31 +32,40 @@ public class Camera {
 				timeToFile.put(aFile.lastModified(), aFile.getAbsolutePath());
 				i++;
 			}
-			if ( timeToFile.size() > 0)
-			{
-			Date lateDate = new Date(timeToFile.firstKey());
-			Date aNewfreshDate = new Date(timeToFile.lastKey());
-			if (freshDate != null && aNewfreshDate.getTime() > freshDate.getTime()) {
-				Fonctions.trace("DBG", "New detection for camera " + name + " sending message to IHM", "Camera");
-				Message aMessage = new Message();
-				aMessage.setImagePath(timeToFile.get(timeToFile.lastKey()));
-				aMessage.setAction("RELOAD");
-				aMessage.setMessage("New detection from " + name);
-				AdminWebSocket.broadcastMessage(aMessage);
-				Calendar aCalendar = Calendar.getInstance();
-				aCalendar.setTimeInMillis(timeToFile.lastKey());
-				aCalendar.set(Calendar.MINUTE, 0);
-				aCalendar.set(Calendar.SECOND, 0);
-				aCalendar.set(Calendar.MILLISECOND, 0);
-				Integer count = 1;
-				if (fileByHour.containsKey(aCalendar.getTimeInMillis())) {
-					count += fileByHour.get(aCalendar.getTimeInMillis());
+			if (timeToFile.size() > 0) {
+				Date lateDate = new Date(timeToFile.firstKey());
+				Date aNewfreshDate = new Date(timeToFile.lastKey());
+				if (freshDate != null && aNewfreshDate.getTime() > freshDate.getTime()) {
+					Fonctions.trace("DBG", "New detection for camera " + name + " sending message to IHM", "Camera");
+					Message aMessage = new Message();
+					aMessage.setImagePath(timeToFile.get(timeToFile.lastKey()));
+					aMessage.setAction("RELOAD");
+					aMessage.setMessage("New detection from " + name);
+					AdminWebSocket.broadcastMessage(aMessage);
+					Calendar aCalendar = Calendar.getInstance();
+					aCalendar.setTimeInMillis(timeToFile.lastKey());
+					aCalendar.set(Calendar.MINUTE, 0);
+					aCalendar.set(Calendar.SECOND, 0);
+					aCalendar.set(Calendar.MILLISECOND, 0);
+					Integer count = 1;
+					if (fileByHour.containsKey(aCalendar.getTimeInMillis())) {
+						count += fileByHour.get(aCalendar.getTimeInMillis());
+					}
+					fileByHour.put(aCalendar.getTimeInMillis(), count);
 				}
-				fileByHour.put(aCalendar.getTimeInMillis(), count);
-			}
-			freshDate = aNewfreshDate;
-			Fonctions.trace("DBG",
-					"Camera " + getName() + " has " + i + " entries from " + lateDate + " to " + freshDate, "Camera");
+				freshDate = aNewfreshDate;
+				Fonctions.trace("DBG",
+						"Camera " + getName() + " has " + i + " entries from " + lateDate + " to " + freshDate,
+						"Camera");
+				if (i == 0) {
+					try {
+						Core.getInstance().getUsers().get("admin").getCameras().get(name).fileByHour.clear();
+						Fonctions.trace("DBG",
+								"Clear entry by hour for " + name,
+								"Camera");
+					} catch (Exception e) {
+					}
+				}
 			}
 		} else {
 			Fonctions.trace("ERR", capturePath + " doesn't exist or not a directory", "Camera");
@@ -161,7 +169,7 @@ public class Camera {
 		} else {
 			calendar.add(Calendar.DAY_OF_YEAR, -Core.getInstance().getDaysBeforePurge());
 		}
-		Integer count=0;
+		Integer count = 0;
 		File captureDir = new File(capturePath);
 		if (captureDir.exists() && captureDir.isDirectory()) {
 			Fonctions.trace("DBG",
@@ -174,8 +182,8 @@ public class Camera {
 						FileUtils.forceDelete(aFile);
 						count++;
 					} catch (IOException e) {
-						Fonctions.trace("ERR", "Can't clean " + aFile.getAbsolutePath() + " " + e.getMessage() + " perhaps you reach 90% of disk usage, kerberos.io don't like it",
-								"Camera");
+						Fonctions.trace("ERR", "Can't clean " + aFile.getAbsolutePath() + " " + e.getMessage()
+								+ " perhaps you reach 90% of disk usage, kerberos.io don't like it", "Camera");
 					}
 				}
 			}

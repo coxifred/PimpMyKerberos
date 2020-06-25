@@ -2,7 +2,9 @@
     
     include("javascript/jquery.js");
 	include("javascript/jquery-ui.js");
+	include("javascript/jquery.ui.rotatable.min.js");
 	
+		
     include("javascript/login.js");
 	include("javascript/semantic.js");        
 	include("javascript/calendar.min.js");        
@@ -186,14 +188,14 @@
 	}
 	
 	 // Quelques fonctions 
-	function getValueFromActionPost(action,type,session,actionName) {
+	function getValueFromActionPost(action,type,data) {
 		var retour;
 		var request = $
 				.ajax({
 					url :  action,
 					type : "POST",
 					method : "POST",
-					data : { payload: session, action: actionName },
+					data : {data:data},
 					crossDomain: true,
 					async : type,
 					dataType : "html",
