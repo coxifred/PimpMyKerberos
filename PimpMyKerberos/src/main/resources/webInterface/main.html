@@ -664,10 +664,35 @@
 				
 			});
 			
+			$("body").delegate(".pictureable", "click", function(){
+				camera=JSON.parse(unescape($(this).attr("data_camera")));
+				randomId=getRandomInt(65535);
+				$("#dashCamContent").append(createPicture(camera,randomId) );
+				$("#topButtonDash").html('<div class="ui yellow button"><i class="plus icon"></i>Add..</div>');
+				
+			});
+			
+			$("body").delegate(".videoable", "click", function(){
+				camera=JSON.parse(unescape($(this).attr("data_camera")));
+				randomId=getRandomInt(65535);
+				$("#dashCamContent").append(createVideo(camera,randomId) );
+				$("#topButtonDash").html('<div class="ui yellow button"><i class="plus icon"></i>Add..</div>');
+				
+			});
+			
 			function createLive(camera,randomId)
 			{
-				return '<div id="' + randomId + "_" + camera.name+ '_loader" class="ui segment"><p></p><div class="ui active dimmer"><div class="ui loader"></div></div></div>  <div  id="' + randomId + "_" + camera.name+ '_drag" ><div style=position:relative><img class=tunable onload=javascript:loadImage(\''+ randomId + "_" + camera.name + '\'); alt="no stream available see logs" id="dashimg_' + randomId + "_" + camera.name + '" style=border-radius:5px;z-index:1000 src=/stream?camName=' + camera.name +'&url=http://' + ip +':' + camera.broadcastPort+'/></div><i name="' + randomId + "_" + camera.name+ '_drag" class="trash icon dashTrashable"></i><i name="' + randomId + "_" + camera.name+ '" class="crop icon resizable"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate horizontal icon perspectiveZ"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate vertical icon perspectiveX"></i></div>';
-				
+				return '<div id="' + randomId + "_" + camera.name+ '_loader" class="ui segment"><p></p><div class="ui active dimmer"><div class="ui loader"></div></div></div>  <div  id="' + randomId + "_" + camera.name+ '_drag" ><div style=position:relative><img class=tunable onerror=javascript:loadImage(\''+ randomId + "_" + camera.name + '\');  onload=javascript:loadImage(\''+ randomId + "_" + camera.name + '\'); alt="no stream available see logs" id="dashimg_' + randomId + "_" + camera.name + '" style=border-radius:5px;z-index:1000 src=/stream?camName=' + camera.name +'&url=http://' + ip +':' + camera.broadcastPort+'/></div><i name="' + randomId + "_" + camera.name+ '_drag" class="trash icon dashTrashable"></i><i name="' + randomId + "_" + camera.name+ '" class="crop icon resizable"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate horizontal icon perspectiveZ"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate vertical icon perspectiveX"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate icon"></i></div>';
+			}
+			
+			function createPicture(camera,randomId)
+			{
+				return '<div id="' + randomId + "_" + camera.name+ '_loader" class="ui segment"><p></p><div class="ui active dimmer"><div class="ui loader"></div></div></div>  <div  id="' + randomId + "_" + camera.name+ '_drag" ><div style=position:relative><img class=tunable onerror=javascript:loadImage(\''+ randomId + "_" + camera.name + '\');  onload=javascript:loadImage(\''+ randomId + "_" + camera.name + '\'); alt="picture not yet available, see logs" id="dashimg_' + randomId + "_" + camera.name + '" style=border-radius:5px;z-index:1000 src="/picture?type=jpg&camName=' + camera.name + '"></div><i name="' + randomId + "_" + camera.name+ '_drag" class="trash icon dashTrashable"></i><i name="' + randomId + "_" + camera.name+ '" class="crop icon resizable"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate horizontal icon perspectiveZ"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate vertical icon perspectiveX"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate icon"></i></div>';
+			}
+			
+			function createVideo(camera,randomId)
+			{
+				return '<div id="' + randomId + "_" + camera.name+ '_loader" class="ui segment"><p></p><div class="ui active dimmer"><div class="ui loader"></div></div></div><div  id="' + randomId + "_" + camera.name+ '_drag" ><div style=position:relative><video loop="true" muted autoplay="true" preload="auto" class="tunable" muted onerror=javascript:loadImage(\''+ randomId + "_" + camera.name + '\');  onload=javascript:loadImage(\''+ randomId + "_" + camera.name + '\'); alt="video not yet available, see logs" id="dashimg_' + randomId + "_" + camera.name + '" style=border-radius:5px;z-index:1000 width=400 controls src=""/picture?type=mp4&stream?camName=' + camera.name +'" >not loading</video></div><i name="' + randomId + "_" + camera.name+ '_drag" class="trash icon dashTrashable"></i><i name="' + randomId + "_" + camera.name+ '" class="crop icon resizable"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate horizontal icon perspectiveZ"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate vertical icon perspectiveX"></i><i name="' + randomId + "_" + camera.name+ '" class="arrows alternate icon"></i></div>';
 			}
 			
 			makeEditable=function (ident)
@@ -1185,8 +1210,8 @@
 						cameraMenu+=camera.name;
 						cameraMenu+='<div class="menu">';
 						       cameraMenu+='<div data_camera="' + escape(JSON.stringify(camera)) +'" class="liveable item">Live view</div>';
-							   cameraMenu+='<div class="item">Last Video</div>';
-							   cameraMenu+='<div class="item">Last Picture</div>';
+							   cameraMenu+='<div data_camera="' + escape(JSON.stringify(camera)) +'" class="videoable item">Last Video</div>';
+							   cameraMenu+='<div data_camera="' + escape(JSON.stringify(camera)) +'" class="pictureable item">Last Picture</div>';
 						cameraMenu+='</div></div>';
 					}
 					$("#cameraHeader").html(html + "</tr></table>");

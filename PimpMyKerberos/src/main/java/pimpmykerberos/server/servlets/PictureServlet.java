@@ -1,9 +1,12 @@
 package pimpmykerberos.server.servlets;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -28,17 +31,24 @@ public class PictureServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-		String url = request.getParameter("url");
+		
 		String camName = request.getParameter("camName");
-
+		// jpg or mp4 (optional)
+		String type = request.getParameter("type");
 		File aFile = new File(Core.getInstance().getKerberosioPath() + "/" + camName + "/capture");
 		if (aFile.exists()) {
 			Camera aCamera = Core.getInstance().getUsers().get("admin").getCameras().get(camName);
 			if (aCamera != null) {
 				if (aCamera.getTimeToFile().size() > 0) {
 					File lastFile = new File(aCamera.getTimeToFile().lastEntry().getValue());
+					if (type != null && !"".equals(type)) {
+						lastFile = foundLastType(type, aCamera.getTimeToFile());
+					} else {
+						lastFile = new File(aCamera.getTimeToFile().lastEntry().getValue());
+					}
+
 					Fonctions.trace("DBG", "Last File is " + lastFile.getAbsolutePath(), "PictureServlet");
-					if (lastFile.exists()) {
+					if (lastFile != null && lastFile.exists()) {
 						if (lastFile.getAbsolutePath().endsWith(".jpg")) {
 							performJpg(lastFile, request, response);
 						} else {
@@ -49,6 +59,7 @@ public class PictureServlet extends HttpServlet {
 						Fonctions.trace("ERR", "Last File " + lastFile.getAbsolutePath() + " is missing",
 								"PictureServlet");
 					}
+
 				} else {
 					Fonctions.trace("ERR", "Camera " + camName + " not yet populated", "PictureServlet");
 				}
@@ -118,6 +129,21 @@ public class PictureServlet extends HttpServlet {
 //				e.printStackTrace();
 //
 //			}
+	}
+
+	private File foundLastType(String type, TreeMap<Long, String> treeMap) {
+		File aFile = null;
+		List<String> aReverseList = new ArrayList<String>(treeMap.values());
+		Collections.reverse(aReverseList);
+		for (String fileName : aReverseList) {
+			if (fileName.endsWith(type) && new File(fileName).exists()) {
+				aFile = new File(fileName);
+				break;
+			}
+		}
+
+		return aFile;
+
 	}
 
 	private void performJpg(File lastFile, HttpServletRequest request, HttpServletResponse response) {
