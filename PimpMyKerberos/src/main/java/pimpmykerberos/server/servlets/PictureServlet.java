@@ -3,6 +3,9 @@ package pimpmykerberos.server.servlets;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +24,7 @@ import org.jcodec.scale.AWTUtil;
 import pimpmykerberos.beans.Camera;
 import pimpmykerberos.core.Core;
 import pimpmykerberos.utils.Fonctions;
+import pimpmykerberos.utils.MJpegReaderRunner;
 
 public class PictureServlet extends HttpServlet {
 
@@ -31,7 +35,6 @@ public class PictureServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-		
 		String camName = request.getParameter("camName");
 		// jpg or mp4 (optional)
 		String type = request.getParameter("type");
@@ -39,31 +42,35 @@ public class PictureServlet extends HttpServlet {
 		if (aFile.exists()) {
 			Camera aCamera = Core.getInstance().getUsers().get("admin").getCameras().get(camName);
 			if (aCamera != null) {
-				if (aCamera.getTimeToFile().size() > 0) {
-					File lastFile = new File(aCamera.getTimeToFile().lastEntry().getValue());
-					if (type != null && !"".equals(type)) {
-						lastFile = foundLastType(type, aCamera.getTimeToFile());
-					} else {
-						lastFile = new File(aCamera.getTimeToFile().lastEntry().getValue());
-					}
+				if (type != null && !"".equals(type) && "live".equals(type)) {
+					performLive(aCamera,request,response);
+				} else {
 
-					Fonctions.trace("DBG", "Last File is " + lastFile.getAbsolutePath(), "PictureServlet");
-					if (lastFile != null && lastFile.exists()) {
-						if (lastFile.getAbsolutePath().endsWith(".jpg")) {
-							performJpg(lastFile, request, response);
+					if (aCamera.getTimeToFile().size() > 0) {
+						File lastFile = new File(aCamera.getTimeToFile().lastEntry().getValue());
+						if (type != null && !"".equals(type)) {
+							lastFile = foundLastType(type, aCamera);
 						} else {
-							performMp4(lastFile, request, response);
+							lastFile = new File(aCamera.getTimeToFile().lastEntry().getValue());
+						}
+
+						Fonctions.trace("DBG", "Last File is " + lastFile.getAbsolutePath(), "PictureServlet");
+						if (lastFile != null && lastFile.exists()) {
+							if (lastFile.getAbsolutePath().endsWith(".jpg")) {
+								performJpg(lastFile, request, response);
+							} else {
+								performMp4(lastFile, request, response);
+							}
+
+						} else {
+							Fonctions.trace("ERR", "Last File " + lastFile.getAbsolutePath() + " is missing",
+									"PictureServlet");
 						}
 
 					} else {
-						Fonctions.trace("ERR", "Last File " + lastFile.getAbsolutePath() + " is missing",
-								"PictureServlet");
+						Fonctions.trace("ERR", "Camera " + camName + " not yet populated", "PictureServlet");
 					}
-
-				} else {
-					Fonctions.trace("ERR", "Camera " + camName + " not yet populated", "PictureServlet");
 				}
-
 			} else {
 				Fonctions.trace("ERR", "Camera " + camName + " not exist", "PictureServlet");
 			}
@@ -131,21 +138,52 @@ public class PictureServlet extends HttpServlet {
 //			}
 	}
 
-	private File foundLastType(String type, TreeMap<Long, String> treeMap) {
+	private File foundLastType(String type, Camera aCamera) {
 		File aFile = null;
-		List<String> aReverseList = new ArrayList<String>(treeMap.values());
-		Collections.reverse(aReverseList);
-		for (String fileName : aReverseList) {
-			if (fileName.endsWith(type) && new File(fileName).exists()) {
-				aFile = new File(fileName);
-				break;
+		TreeMap<Long, String> treeMap = aCamera.getTimeToFile();
+			List<String> aReverseList = new ArrayList<String>(treeMap.values());
+			Collections.reverse(aReverseList);
+			for (String fileName : aReverseList) {
+				if (fileName.endsWith(type) && new File(fileName).exists()) {
+					aFile = new File(fileName);
+					break;
+				}
+			}
+		
+		return aFile;
+	}
+
+	
+	private void performLive(Camera aCamera, HttpServletRequest request, HttpServletResponse response) {
+		MJpegReaderRunner reader=new MJpegReaderRunner();
+		String url = "http://" + aCamera.getIp() + ":" + aCamera.getBroadcastPort();
+		InputStream fin=null;
+		try {
+			fin = new URL(url).openStream();
+			reader.init(fin);
+			reader.start();
+			response.setContentType("image/jpeg");
+			ServletOutputStream out = response.getOutputStream();
+			Fonctions.attendre(300);
+			reader.getJpgOut().writeTo(out);
+			out.flush();
+		} catch (Exception e) {
+			Fonctions.trace("ERR", "Can't extract jpeg from live stream " + url + " error:" + e.getMessage(),
+					"PictureServlet");
+			e.printStackTrace();
+		} finally
+		{
+			try {
+				fin.close();
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
-		return aFile;
-
 	}
-
+	
 	private void performJpg(File lastFile, HttpServletRequest request, HttpServletResponse response) {
 		FileInputStream fis;
 		try {

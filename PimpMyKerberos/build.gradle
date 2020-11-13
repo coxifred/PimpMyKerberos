@@ -47,6 +47,8 @@ dependencies {
         compile group: 'org.jcodec', name: 'jcodec-android', version: '0.2.5'
         
 
+// https://mvnrepository.com/artifact/com.bitplan/com.bitplan.mjpegstreamer
+compile group: 'com.bitplan', name: 'com.bitplan.mjpegstreamer', version: '0.0.7'
 /*
         compile group: 'org.deeplearning4j',             name: 'deeplearning4j-ui',                version: '1.0.0-beta6'
         compile group: 'org.nd4j',                   name: 'nd4j-native-platform',         version : '1.0.0-beta6'
