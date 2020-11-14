@@ -13,7 +13,7 @@ plugins {
 
 
 def jettyVersion = "9.4.25.v20191220"
-def args4j.version = "2.33"
+
 
 repositories {
     // Use jcenter for resolving dependencies.
@@ -49,6 +49,9 @@ dependencies {
 
 // https://mvnrepository.com/artifact/com.bitplan/com.bitplan.mjpegstreamer
 compile group: 'com.bitplan', name: 'com.bitplan.mjpegstreamer', version: '0.0.7'
+// https://mvnrepository.com/artifact/args4j/args4j
+compile group: 'args4j', name: 'args4j', version: '2.33'
+
 /*
         compile group: 'org.deeplearning4j',             name: 'deeplearning4j-ui',                version: '1.0.0-beta6'
         compile group: 'org.nd4j',                   name: 'nd4j-native-platform',         version : '1.0.0-beta6'
