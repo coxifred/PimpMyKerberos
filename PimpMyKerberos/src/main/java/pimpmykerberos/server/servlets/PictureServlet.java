@@ -174,7 +174,10 @@ public class PictureServlet extends HttpServlet {
 		} finally
 		{
 			try {
+				if ( fin != null) 
+				{
 				fin.close();
+				}
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
