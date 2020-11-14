@@ -156,7 +156,14 @@ public class PictureServlet extends HttpServlet {
 	
 	private void performLive(Camera aCamera, HttpServletRequest request, HttpServletResponse response) {
 		MJpegReaderRunner reader=new MJpegReaderRunner();
+		String existingUrl=request.getParameter("url");
 		String url = "http://" + aCamera.getIp() + ":" + aCamera.getBroadcastPort();
+		if ( existingUrl != null && ! "".equals(existingUrl))
+				{
+			Fonctions.trace("INF", "Using url camera provided " + existingUrl,
+					"PictureServlet");
+			url=existingUrl;
+				}
 		InputStream fin=null;
 		try {
 			fin = new URL(url).openStream();

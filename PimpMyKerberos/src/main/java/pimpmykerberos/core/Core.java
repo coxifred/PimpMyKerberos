@@ -249,6 +249,8 @@ public class Core {
 							Fonctions.trace("INF", "Found interesting ip " + anAddress, "CORE");
 							ws.setIp(anAddress.toString().replaceAll("/", ""));
 							Fonctions.trace("INF", "Webserver ip " + ws.getIp(), "CORE");
+							// Push ip on camera if null
+							setCameraIpInCaseOfNull(ws.getIp());
 							found = true;
 							break;
 						} else {
@@ -266,6 +268,15 @@ public class Core {
 
 		} else {
 			ws.setIp(getWebServerIp());
+			// Push ip on camera if null
+			if ( ws.getIp() == "0.0.0.0" )
+			{
+				setCameraIpInCaseOfNull("127.0.0.1");
+			}else
+			{
+				setCameraIpInCaseOfNull(ws.getIp());
+			}
+
 		}
 		ws.setPort(getWebServerPort());
 		ws.startWebSocket(http2);
@@ -667,6 +678,18 @@ public class Core {
 			return aCamera.clean();
 		}
 		return 0;
+	}
+	
+	public void setCameraIpInCaseOfNull(String ip)
+	{
+		User requester = Core.getInstance().getUsers().get("admin");
+		for ( Camera aCamera : requester.getCameras().values())
+		{
+			if (aCamera != null && aCamera.getIp() == null) {
+				Fonctions.trace("DBG", "Setting ip " + ip + " on camera " + aCamera.getName() + " because null", "Core");
+				aCamera.setIp(ip);
+			}
+		}
 	}
 
 	public Integer cleanAll() {
