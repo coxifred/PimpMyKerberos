@@ -231,47 +231,41 @@ public class Core {
 
 		Fonctions.trace("INF", "Starting webserver on port " + getWebServerPort(), "CORE");
 		ws = new Webserver();
+		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 		if (getWebServerIp() == null) {
-			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+			
 			Fonctions.trace("INF",
 					"Looking network interface <> 127.0.0.1 (can be tuned by adding this line <webServerIp>your_ip</webServerIp> in aCore.xml",
 					"CORE");
-			Boolean found = false;
-			for (NetworkInterface netint : Collections.list(nets)) {
-				Fonctions.trace("INF", "Watching under physical interface " + netint.getDisplayName(), "CORE");
-				if (!netint.getDisplayName().contains("docker")) {
-					Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-					for (InetAddress anAddress : Collections.list(inetAddresses)) {
-						Fonctions.trace("INF", "IP available " + anAddress, "CORE");
-						if (!("/127.0.0.1").equals(anAddress.toString())
-								&& !("/0:0:0:0:0:0:0:1").equals(anAddress.toString())
-								&& !anAddress.toString().contains(":")) {
-							Fonctions.trace("INF", "Found interesting ip " + anAddress, "CORE");
-							ws.setIp(anAddress.toString().replaceAll("/", ""));
-							Fonctions.trace("INF", "Webserver ip " + ws.getIp(), "CORE");
-							// Push ip on camera if null
-							setCameraIpInCaseOfNull(ws.getIp());
-							found = true;
-							break;
-						} else {
-							Fonctions.trace("WNG", "Ip not interesting " + anAddress, "CORE");
-						}
-
-					}
-					if (found) {
-						break;
-					}
-				} else {
-					Fonctions.trace("INF", "It's a docker interface bypass " + netint.getDisplayName(), "CORE");
-				}
+			String foundAdress=extractedAdress(nets);
+			if ( foundAdress != null )
+			{
+				ws.setIp(foundAdress);
+				Fonctions.trace("INF", "Webserver ip " + ws.getIp(), "CORE");
+				// Push ip on camera if null
+				setCameraIpInCaseOfNull(ws.getIp());	
+			}else
+			{
+				Fonctions.trace("ERR", " Can't find an adress available :(, using 0.0.0.0 ", "CORE");
+				ws.setIp("0.0.0.0");
+				setCameraIpInCaseOfNull(ws.getIp());
 			}
 
 		} else {
 			ws.setIp(getWebServerIp());
 			// Push ip on camera if null
-			if ( ws.getIp() == "0.0.0.0" )
+			Fonctions.trace("INF", " ws.getIp() = " +ws.getIp(), "CORE");
+			if ( ws.getIp().equals("0.0.0.0"))
 			{
-				setCameraIpInCaseOfNull("127.0.0.1");
+				String foundAdress=extractedAdress(nets);
+				if ( foundAdress != null )
+				{
+					setCameraIpInCaseOfNull(foundAdress);
+				} else
+				{
+					Fonctions.trace("ERR", " Can't find an adress available :(, using 0.0.0.0 ", "CORE");
+					setCameraIpInCaseOfNull("0.0.0.0");
+				}
 			}else
 			{
 				setCameraIpInCaseOfNull(ws.getIp());
@@ -336,6 +330,32 @@ public class Core {
 
 		Fonctions.trace("INF", "Ending main core", "CORE");
 		System.exit(0);
+	}
+
+	private String extractedAdress(Enumeration<NetworkInterface> nets) {
+		
+		for (NetworkInterface netint : Collections.list(nets)) {
+			Fonctions.trace("INF", "Watching under physical interface " + netint.getDisplayName(), "CORE");
+			if (!netint.getDisplayName().contains("docker")) {
+				Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+				for (InetAddress anAddress : Collections.list(inetAddresses)) {
+					Fonctions.trace("INF", "IP available " + anAddress, "CORE");
+					if (!("/127.0.0.1").equals(anAddress.toString())
+							&& !("/0:0:0:0:0:0:0:1").equals(anAddress.toString())
+							&& !anAddress.toString().contains(":")) {
+						Fonctions.trace("INF", "Found interesting ip " + anAddress, "CORE");
+						return anAddress.toString().replaceAll("/", "");
+					} else {
+						Fonctions.trace("WNG", "Ip not interesting " + anAddress, "CORE");
+					}
+
+				}
+				
+			} else {
+				Fonctions.trace("INF", "It's a docker interface bypass " + netint.getDisplayName(), "CORE");
+			}
+		}
+		return null;
 	}
 
 	private void loadPlugin() throws IOException {
